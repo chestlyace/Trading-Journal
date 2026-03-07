@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tradge Onboarding - Add Account</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<div class="relative flex h-full min-h-screen w-full max-w-md flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+<!-- Top Navigation -->
+<div class="flex items-center p-4 justify-between">
+<div class="text-slate-900 dark:text-slate-100 flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-12">Add Account</h2>
+</div>
+<!-- Progress Indicator -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-4">
+<div class="h-2.5 w-2.5 rounded-full bg-primary"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+</div>
+<!-- Content Area -->
+<div class="flex flex-col items-center px-6 pt-8 pb-4">
+<div class="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[48px] font-light">work</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-[28px] font-bold leading-tight text-center">Add your first trading account</h1>
+<p class="text-slate-500 dark:text-slate-400 text-center mt-2 text-sm">Connect your broker to start tracking your performance with ease.</p>
+</div>
+<!-- Form Fields -->
+<div class="flex flex-col gap-5 px-6 py-4">
+<!-- Account Name -->
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Account Name</span>
+<input class="form-input flex w-full rounded-lg border border-slate-200 dark:border-primary/20 bg-white dark:bg-primary/5 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="e.g. Personal Portfolio" type="text"/>
+</label>
+<!-- Broker Name -->
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Broker Name</span>
+<input class="form-input flex w-full rounded-lg border border-slate-200 dark:border-primary/20 bg-white dark:bg-primary/5 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="e.g. Oanda, MetaTrader" type="text"/>
+</label>
+<!-- Account Type (Segmented Control) -->
+<div class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Account Type</span>
+<div class="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-primary/10 rounded-xl border border-slate-200 dark:border-primary/20">
+<button class="bg-white dark:bg-primary py-2 px-1 text-sm font-bold rounded-lg shadow-sm text-primary dark:text-white">Live</button>
+<button class="py-2 px-1 text-sm font-medium text-slate-500 dark:text-slate-400">Demo</button>
+<button class="py-2 px-1 text-sm font-medium text-slate-500 dark:text-slate-400 text-nowrap">Prop Firm</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Base Currency -->
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Base Currency</span>
+<div class="relative">
+<select class="appearance-none w-full rounded-lg border border-slate-200 dark:border-primary/20 bg-white dark:bg-primary/5 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+<option>USD</option>
+<option>EUR</option>
+<option>GBP</option>
+<option>JPY</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
+</div>
+</label>
+<!-- Starting Balance -->
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Starting Balance</span>
+<input class="font-mono form-input flex w-full rounded-lg border border-slate-200 dark:border-primary/20 bg-white dark:bg-primary/5 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="10,000.00" type="text"/>
+</label>
+</div>
+</div>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- CTA Button -->
+<div class="p-6">
+<button class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-4 text-base font-bold text-white shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">
+                Add Account
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+<!-- Optional background element for visual depth -->
+<div class="absolute -bottom-20 -left-20 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none"></div>
+</div>
+</body></html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#09090b", // Custom dark background as per request
+                        "border-dark": "#27272a",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-toggle {
+            width: 44px;
+            height: 24px;
+        }
+        .custom-toggle-dot {
+            width: 18px;
+            height: 18px;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.2s ease;
+        }
+        input:checked + .custom-toggle-bg {
+            background-color: #16a24e;
+        }
+        input:checked + .custom-toggle-bg .custom-toggle-dot {
+            transform: translateX(20px);
+        }
+        .border-1 {
+            border-width: 1px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-border-dark px-4 py-4 flex items-center gap-4">
+<a class="flex items-center justify-center p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+</a>
+<h1 class="text-xl font-bold tracking-tight">Notifications</h1>
+</header>
+<main class="flex-1 max-w-2xl mx-auto w-full pb-24">
+<!-- Section 1: In-App Notifications -->
+<section class="mt-8 px-4">
+<h2 class="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4 px-1">In-App Notifications</h2>
+<div class="space-y-0 border-1 border-slate-200 dark:border-border-dark rounded-xl overflow-hidden bg-white dark:bg-transparent">
+<!-- Trade Log Reminder -->
+<div class="p-4 border-b border-slate-200 dark:border-border-dark">
+<div class="flex items-center justify-between">
+<span class="text-base font-medium">Trade Log Reminder</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+<!-- Sub-setting -->
+<div class="mt-4 pt-4 border-t border-slate-200 dark:border-border-dark flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-xs font-mono uppercase text-slate-500">Reminder time</span>
+<span class="text-sm font-medium mt-1">6:00 PM, Mon-Fri</span>
+</div>
+<button class="flex items-center gap-1 text-primary text-sm font-semibold">
+                            Edit
+                            <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- AI Report Ready -->
+<div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-border-dark">
+<span class="text-base font-medium">AI Report Ready</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+<!-- Goal Milestone -->
+<div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-border-dark">
+<span class="text-base font-medium">Goal Milestone</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+<!-- Risk Alert -->
+<div class="flex items-center justify-between p-4">
+<span class="text-base font-medium">Risk Alert</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+</div>
+</section>
+<!-- Section 2: Email Digest -->
+<section class="mt-12 px-4">
+<h2 class="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4 px-1">Email Digest</h2>
+<div class="space-y-0 border-1 border-slate-200 dark:border-border-dark rounded-xl overflow-hidden bg-white dark:bg-transparent">
+<!-- Weekly summary -->
+<div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-border-dark">
+<span class="text-base font-medium">Weekly summary email</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+<!-- Monthly report -->
+<div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-border-dark">
+<span class="text-base font-medium">Monthly report email</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+<!-- Promotional -->
+<div class="flex items-center justify-between p-4">
+<span class="text-base font-medium">Promotional / tips email</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="custom-toggle bg-slate-200 dark:bg-border-dark rounded-full peer-checked:bg-primary transition-colors relative custom-toggle-bg">
+<div class="custom-toggle-dot absolute bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+</div>
+</section>
+<!-- Section 3: Push Notifications -->
+<section class="mt-12 px-4">
+<h2 class="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4 px-1">Push Notifications</h2>
+<div class="p-6 border-1 border-slate-200 dark:border-border-dark rounded-xl bg-white dark:bg-transparent text-center">
+<span class="material-symbols-outlined text-4xl text-primary mb-4">notifications_active</span>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                    Stay updated on your trades even when you're away. Enable push notifications in your device settings to get real-time alerts.
+                </p>
+<a class="inline-flex items-center justify-center px-6 py-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all" href="#">
+                    Open Mobile Setup
+                </a>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200 dark:border-border-dark bg-white dark:bg-background-dark/95 backdrop-blur-sm px-6 py-3">
+<div class="max-w-md mx-auto flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+</a>
+</div>
+</nav>
+</body></html>

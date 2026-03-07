@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&amp;family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#09090b", // Custom dark as per request
+                        "border-zinc": "#27272a",
+                        "text-zinc-primary": "#fafafa",
+                        "text-zinc-secondary": "#a1a1aa",
+                    },
+                    fontFamily: {
+                        "display": ["Geist", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .mono {
+            font-family: 'Geist Mono', monospace;
+        }
+        /* Editorial Minimalism: No shadows, strict borders */
+        * {
+            box-shadow: none !important;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-zinc-primary min-h-screen flex flex-col">
+<!-- Header -->
+<header class="flex items-center px-4 pt-8 pb-4 border-b border-border-zinc">
+<button class="mr-4 text-text-zinc-secondary hover:text-text-zinc-primary transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="text-xl font-semibold tracking-tight">Appearance</h1>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Theme Section -->
+<section class="p-6 border-b border-border-zinc">
+<h2 class="text-xs font-bold uppercase tracking-widest text-text-zinc-secondary mb-6">Theme Selection</h2>
+<div class="grid grid-cols-3 gap-4">
+<!-- Light -->
+<div class="flex flex-col gap-3 group cursor-pointer">
+<div class="h-[60px] w-full bg-slate-100 border border-border-zinc rounded flex flex-col p-1.5 gap-1">
+<div class="h-2 w-full bg-slate-300 rounded-sm"></div>
+<div class="h-1 w-2/3 bg-slate-300 rounded-sm"></div>
+<div class="mt-auto h-3 w-3 bg-primary rounded-full"></div>
+</div>
+<span class="text-xs font-medium text-center text-text-zinc-secondary">Light</span>
+</div>
+<!-- Dark (Selected) -->
+<div class="flex flex-col gap-3 group cursor-pointer">
+<div class="h-[60px] w-full bg-zinc-900 border-2 border-primary rounded flex flex-col p-1.5 gap-1">
+<div class="h-2 w-full bg-zinc-800 rounded-sm"></div>
+<div class="h-1 w-2/3 bg-zinc-800 rounded-sm"></div>
+<div class="mt-auto h-3 w-3 bg-primary rounded-full"></div>
+</div>
+<span class="text-xs font-medium text-center text-text-zinc-primary">Dark</span>
+</div>
+<!-- System -->
+<div class="flex flex-col gap-3 group cursor-pointer">
+<div class="h-[60px] w-full bg-zinc-900 border border-border-zinc rounded overflow-hidden relative">
+<div class="absolute inset-0 bg-slate-100 w-1/2"></div>
+<div class="absolute inset-0 flex flex-col p-1.5 gap-1 z-10">
+<div class="h-2 w-full bg-zinc-500/20 rounded-sm"></div>
+<div class="h-1 w-2/3 bg-zinc-500/20 rounded-sm"></div>
+</div>
+</div>
+<span class="text-xs font-medium text-center text-text-zinc-secondary">System</span>
+</div>
+</div>
+</section>
+<!-- Density Section -->
+<section class="p-6 border-b border-border-zinc">
+<h2 class="text-xs font-bold uppercase tracking-widest text-text-zinc-secondary mb-6">Display Density</h2>
+<div class="flex bg-zinc-900/50 border border-border-zinc p-1 rounded">
+<button class="flex-1 py-2 text-xs font-medium text-text-zinc-secondary hover:text-text-zinc-primary transition-colors">Compact</button>
+<button class="flex-1 py-2 text-xs font-medium bg-zinc-800 text-text-zinc-primary border border-border-zinc rounded">Default</button>
+<button class="flex-1 py-2 text-xs font-medium text-text-zinc-secondary hover:text-text-zinc-primary transition-colors">Comfortable</button>
+</div>
+</section>
+<!-- Number Format Section -->
+<section class="p-6">
+<h2 class="text-xs font-bold uppercase tracking-widest text-text-zinc-secondary mb-6">Number Formatting</h2>
+<div class="space-y-8">
+<!-- Thousands Separator -->
+<div class="flex flex-col gap-4">
+<label class="text-sm font-medium text-text-zinc-secondary">Thousands Separator</label>
+<div class="grid grid-cols-2 gap-3">
+<div class="p-4 border-2 border-primary bg-zinc-900/50 rounded flex flex-col gap-1 cursor-pointer">
+<span class="mono text-lg font-medium text-text-zinc-primary">1,234.56</span>
+<span class="text-[10px] text-text-zinc-secondary uppercase">Comma</span>
+</div>
+<div class="p-4 border border-border-zinc bg-zinc-900/20 rounded flex flex-col gap-1 cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
+<span class="mono text-lg font-medium text-text-zinc-primary">1.234,56</span>
+<span class="text-[10px] text-text-zinc-secondary uppercase">Period</span>
+</div>
+</div>
+</div>
+<!-- Currency Position -->
+<div class="flex flex-col gap-4">
+<label class="text-sm font-medium text-text-zinc-secondary">Currency Position</label>
+<div class="grid grid-cols-2 gap-3">
+<div class="p-4 border-2 border-primary bg-zinc-900/50 rounded flex flex-col gap-1 cursor-pointer">
+<span class="mono text-lg font-medium text-text-zinc-primary">$1,234.56</span>
+<span class="text-[10px] text-text-zinc-secondary uppercase">Prefix</span>
+</div>
+<div class="p-4 border border-border-zinc bg-zinc-900/20 rounded flex flex-col gap-1 cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
+<span class="mono text-lg font-medium text-text-zinc-primary">1,234.56 $</span>
+<span class="text-[10px] text-text-zinc-secondary uppercase">Suffix</span>
+</div>
+</div>
+</div>
+<!-- Example Preview (P&L Highlight) -->
+<div class="bg-zinc-900 border border-border-zinc p-4 rounded mt-4">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs text-text-zinc-secondary font-medium">Daily P&amp;L Preview</span>
+<span class="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase">Live</span>
+</div>
+<div class="mono text-2xl font-semibold text-primary">+$1,452.80</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-dark border-t border-border-zinc px-6 py-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-text-zinc-secondary hover:text-text-zinc-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">book</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Journal</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-zinc-secondary hover:text-text-zinc-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">monitoring</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Analytics</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-zinc-secondary hover:text-text-zinc-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">swap_horiz</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Trades</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-zinc-primary" href="#">
+<span class="material-symbols-outlined text-[24px] font-variation-fill-1">settings</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Settings</span>
+</a>
+</nav>
+<!-- Mobile Edge Fade -->
+<div class="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background-dark to-transparent pointer-events-none mb-16"></div>
+</body></html>

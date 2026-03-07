@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;family=Geist+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                        "win": "#16a24e",
+                        "loss": "#ef4444",
+                        "open": "#64748b",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- Header Section -->
+<header class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/50 px-4 py-6">
+<div class="flex items-baseline justify-between max-w-2xl mx-auto">
+<h1 class="text-[28px] font-bold tracking-tight">Trade History</h1>
+<span class="font-mono text-slate-500 dark:text-slate-400 text-sm">234</span>
+</div>
+</header>
+<!-- Filter Bar -->
+<div class="sticky top-[84px] z-10 bg-background-light dark:bg-background-dark px-4 py-3 border-b border-slate-200 dark:border-slate-800/50">
+<div class="flex items-center gap-3 max-w-2xl mx-auto overflow-x-auto no-scrollbar">
+<button class="flex h-9 items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 px-4 transition-colors hover:bg-slate-200 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+<span class="text-sm font-medium">Filter</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<button class="flex h-9 items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 px-4 transition-colors hover:bg-slate-200 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="text-sm font-medium whitespace-nowrap">Jan 1 – Mar 7</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Trade List -->
+<main class="max-w-2xl mx-auto pb-24">
+<!-- Win Row -->
+<div class="relative flex items-center h-[72px] border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-win"></div>
+<div class="flex w-full items-center justify-between px-4">
+<div class="flex flex-col">
+<span class="text-base font-bold">BTC/USD</span>
+<span class="font-mono text-[12px] text-slate-500">24 Oct</span>
+</div>
+<div class="hidden sm:block">
+<span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">ICT Silver Bullet</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-base font-bold text-win">+$420.00</span>
+<span class="text-[10px] uppercase font-bold text-slate-500">Win</span>
+</div>
+</div>
+</div>
+<!-- Loss Row -->
+<div class="relative flex items-center h-[72px] border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-loss"></div>
+<div class="flex w-full items-center justify-between px-4">
+<div class="flex flex-col">
+<span class="text-base font-bold">ETH/USD</span>
+<span class="font-mono text-[12px] text-slate-500">23 Oct</span>
+</div>
+<div class="hidden sm:block">
+<span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Mean Reversion</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-base font-bold text-loss">-$150.00</span>
+<span class="text-[10px] uppercase font-bold text-slate-500">Loss</span>
+</div>
+</div>
+</div>
+<!-- Open Row -->
+<div class="relative flex items-center h-[72px] border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-open"></div>
+<div class="flex w-full items-center justify-between px-4">
+<div class="flex flex-col">
+<span class="text-base font-bold">SOL/USD</span>
+<span class="font-mono text-[12px] text-slate-500">22 Oct</span>
+</div>
+<div class="hidden sm:block">
+<span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Trend Follow</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-base font-bold text-slate-100">$0.00</span>
+<span class="text-[10px] uppercase font-bold text-slate-500">Open</span>
+</div>
+</div>
+</div>
+<!-- Win Row -->
+<div class="relative flex items-center h-[72px] border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-win"></div>
+<div class="flex w-full items-center justify-between px-4">
+<div class="flex flex-col">
+<span class="text-base font-bold">AAPL</span>
+<span class="font-mono text-[12px] text-slate-500">21 Oct</span>
+</div>
+<div class="hidden sm:block">
+<span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Breakout</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-base font-bold text-win">+$1,280.00</span>
+<span class="text-[10px] uppercase font-bold text-slate-500">Win</span>
+</div>
+</div>
+</div>
+<!-- BE Row -->
+<div class="relative flex items-center h-[72px] border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-slate-400"></div>
+<div class="flex w-full items-center justify-between px-4">
+<div class="flex flex-col">
+<span class="text-base font-bold">NVDA</span>
+<span class="font-mono text-[12px] text-slate-500">20 Oct</span>
+</div>
+<div class="hidden sm:block">
+<span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Scalp</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-base font-bold text-slate-100">+$2.40</span>
+<span class="text-[10px] uppercase font-bold text-slate-500">BE</span>
+</div>
+</div>
+</div>
+<!-- Win Row -->
+<div class="relative flex items-center h-[72px] border-b border-slate-200 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-win"></div>
+<div class="flex w-full items-center justify-between px-4">
+<div class="flex flex-col">
+<span class="text-base font-bold">XAU/USD</span>
+<span class="font-mono text-[12px] text-slate-500">19 Oct</span>
+</div>
+<div class="hidden sm:block">
+<span class="px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">FVG Entry</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-base font-bold text-win">+$840.00</span>
+<span class="text-[10px] uppercase font-bold text-slate-500">Win</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-30 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-800/50">
+<div class="flex h-16 items-center justify-around max-w-2xl mx-auto px-4 relative">
+<a class="flex flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-bold">analytics</span>
+<span class="text-[10px] font-medium uppercase tracking-widest">Trades</span>
+</a>
+<!-- FAB -->
+<div class="relative -top-6">
+<button class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-4 border-background-light dark:border-background-dark transition-transform active:scale-95">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-medium uppercase tracking-widest">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium uppercase tracking-widest">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

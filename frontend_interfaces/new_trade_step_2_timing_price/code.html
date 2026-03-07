@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>New Trade - Timing &amp; Price</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Geist+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0rem",
+                        "lg": "0rem",
+                        "xl": "0rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Editorial Minimalism: No shadows, high contrast borders */
+        .form-input, .form-select {
+            box-shadow: none !important;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col max-w-lg mx-auto border-x border-slate-200 dark:border-primary/20">
+<!-- TopAppBar -->
+<div class="flex items-center p-6 pb-2 justify-between">
+<div class="text-slate-900 dark:text-slate-100 flex size-10 shrink-0 items-center cursor-pointer">
+<span class="material-symbols-outlined text-3xl">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-extrabold leading-tight tracking-tight flex-1 px-4">New Trade</h2>
+<div class="text-slate-900 dark:text-slate-100 flex size-10 shrink-0 items-center justify-end">
+<span class="material-symbols-outlined text-2xl">close</span>
+</div>
+</div>
+<!-- Progress Section -->
+<div class="flex flex-col gap-3 p-6 pt-4">
+<div class="flex gap-6 justify-between items-end">
+<p class="text-slate-500 dark:text-primary/70 text-sm font-bold uppercase tracking-widest">Step 2: Timing &amp; Price</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-mono font-bold">02 / 06</p>
+</div>
+<div class="h-1 w-full bg-slate-200 dark:bg-primary/10">
+<div class="h-1 bg-primary" style="width: 33.33%;"></div>
+</div>
+</div>
+<!-- Header -->
+<header class="px-6 py-8">
+<h1 class="text-slate-900 dark:text-slate-100 text-4xl font-extrabold leading-none tracking-tighter">
+                Timing &amp; <br/>Price
+            </h1>
+</header>
+<!-- Form Fields -->
+<form class="flex flex-col gap-8 px-6 pb-24">
+<!-- Entry Date/Time -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    Entry Date/Time
+                </label>
+<div class="relative flex items-center border-b-2 border-slate-900 dark:border-primary">
+<input class="form-input block w-full bg-transparent border-none px-0 py-4 text-xl focus:ring-0 placeholder:text-slate-300 dark:placeholder:text-slate-700 font-medium" placeholder="2023-11-24 09:30" type="text"/>
+<span class="material-symbols-outlined text-primary ml-2">calendar_today</span>
+</div>
+</div>
+<!-- Entry Price -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    Entry Price
+                </label>
+<div class="relative flex items-center border-b-2 border-slate-900 dark:border-primary">
+<span class="text-2xl font-mono text-primary pr-3">$</span>
+<input class="form-input block w-full bg-transparent border-none px-0 py-4 text-3xl font-mono focus:ring-0 placeholder:text-slate-300 dark:placeholder:text-slate-700" placeholder="0.00" step="0.01" type="number"/>
+<span class="material-symbols-outlined text-slate-400">payments</span>
+</div>
+</div>
+<!-- Account Selection -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    Select Account
+                </label>
+<div class="relative flex items-center border-b-2 border-slate-900 dark:border-primary">
+<select class="form-select block w-full bg-transparent border-none px-0 py-4 text-xl focus:ring-0 font-medium appearance-none">
+<option class="bg-background-dark">Main Portfolio</option>
+<option class="bg-background-dark">Day Trading Alpha</option>
+<option class="bg-background-dark">Long Term Storage</option>
+<option class="bg-background-dark">Risk Hedge</option>
+</select>
+<span class="material-symbols-outlined text-primary pointer-events-none absolute right-0">unfold_more</span>
+</div>
+</div>
+<!-- Market Context Info -->
+<div class="mt-4 p-4 border border-slate-200 dark:border-primary/20 bg-slate-50 dark:bg-primary/5">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Prices are pulled from the default market feed. Ensure your entry price matches your execution receipt.
+                    </p>
+</div>
+</div>
+</form>
+<!-- Footer Actions -->
+<div class="fixed bottom-0 left-0 right-0 max-w-lg mx-auto p-6 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-primary/20 flex gap-4">
+<button class="flex-1 border-2 border-slate-900 dark:border-primary py-4 px-6 text-sm font-bold uppercase tracking-widest hover:bg-slate-900 hover:text-white dark:hover:bg-primary dark:hover:text-background-dark transition-colors">
+                Back
+            </button>
+<button class="flex-[2] bg-primary text-background-dark py-4 px-6 text-sm font-bold uppercase tracking-widest hover:bg-opacity-90 transition-colors">
+                Next Step
+            </button>
+</div>
+</div>
+</body></html>

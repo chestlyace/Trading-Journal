@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tradge - New Trade</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .mono-text {
+            font-family: 'Geist Mono', monospace;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="max-w-xl mx-auto min-h-screen flex flex-col border-x border-primary/10 dark:border-primary/20 bg-background-light dark:bg-background-dark">
+<!-- Top Navigation -->
+<header class="flex items-center p-6 border-b border-primary/10 dark:border-primary/20">
+<button class="text-slate-900 dark:text-slate-100 hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center text-lg font-bold tracking-tight">New Trade</h1>
+<div class="w-6"></div> <!-- Spacer for centering -->
+</header>
+<!-- Progress Section -->
+<div class="px-6 py-8">
+<div class="flex justify-between items-end mb-3">
+<div class="flex flex-col">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1">Step 1 of 6</span>
+<h2 class="text-2xl font-bold">Trade Definition</h2>
+</div>
+<span class="mono-text text-sm font-medium opacity-60">1/6</span>
+</div>
+<div class="h-1.5 w-full bg-primary/10 dark:bg-primary/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/6"></div>
+</div>
+</div>
+<!-- Form Content -->
+<main class="flex-1 px-6 space-y-8">
+<!-- Instrument Input -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-slate-600 dark:text-slate-400">Instrument</label>
+<div class="relative">
+<input class="w-full bg-transparent border-2 border-primary/20 dark:border-primary/10 focus:border-primary rounded-lg px-4 py-4 text-lg font-medium outline-none transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="e.g. BTC/USDT" type="text"/>
+</div>
+</div>
+<!-- Asset Class Select -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-slate-600 dark:text-slate-400">Asset Class</label>
+<div class="relative">
+<select class="w-full appearance-none bg-transparent border-2 border-primary/20 dark:border-primary/10 focus:border-primary rounded-lg px-4 py-4 text-lg font-medium outline-none transition-colors">
+<option disabled="" selected="" value="">Select Class</option>
+<option value="crypto">Crypto</option>
+<option value="forex">Forex</option>
+<option value="stocks">Stocks</option>
+<option value="commodities">Commodities</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Direction Toggle (Segmented Control) -->
+<div class="space-y-3">
+<label class="block text-sm font-medium text-slate-600 dark:text-slate-400">Direction</label>
+<div class="grid grid-cols-2 gap-0 border-2 border-primary/20 dark:border-primary/10 rounded-xl overflow-hidden">
+<button class="flex items-center justify-center gap-2 py-5 bg-primary text-white font-bold transition-all">
+<span class="material-symbols-outlined font-bold">trending_up</span>
+<span class="tracking-tight uppercase">↑ LONG</span>
+</button>
+<button class="flex items-center justify-center gap-2 py-5 hover:bg-primary/5 dark:hover:bg-primary/10 text-slate-400 font-bold transition-all">
+<span class="material-symbols-outlined font-bold">trending_down</span>
+<span class="tracking-tight uppercase">↓ SHORT</span>
+</button>
+</div>
+</div>
+<!-- Visual Asset Context (Editorial Minimalism) -->
+<div class="pt-4">
+<div class="p-6 border border-primary/10 dark:border-primary/20 rounded-xl bg-primary/5">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs uppercase tracking-tighter font-bold opacity-50">Market Status</span>
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="mono-text text-[10px] font-bold">LIVE</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-sm opacity-60 leading-relaxed">Defining your trade parameters is the first step toward disciplined execution. Ensure the instrument name matches your primary exchange ticker.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer CTA -->
+<footer class="p-6 mt-12 border-t border-primary/10 dark:border-primary/20">
+<button class="w-full bg-primary hover:bg-primary/90 text-white py-5 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+<span>Next Step</span>
+<span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+</footer>
+</div>
+</body></html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tradge AI Insights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                    },
+                    fontFamily: {
+                        "display": ["Geist", "Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Geist', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/20 p-4">
+<div class="flex items-center justify-between max-w-2xl mx-auto w-full">
+<div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">AI Insights</h1>
+<p class="text-xs font-mono text-primary uppercase tracking-wider">Updated 2 hours ago</p>
+</div>
+<button class="flex items-center justify-center p-2 rounded-full border border-primary/30 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl">colors_spark</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto max-w-2xl mx-auto w-full pb-32">
+<!-- Weekly Report Card (Inverted/Dark Surface) -->
+<section class="p-4">
+<div class="bg-slate-900 dark:bg-primary/5 border border-primary/20 rounded-xl p-6 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-20">
+<span class="material-symbols-outlined text-6xl text-primary">trending_up</span>
+</div>
+<p class="text-[10px] font-mono text-primary font-bold uppercase tracking-[0.2em] mb-2">Weekly Performance</p>
+<h2 class="text-2xl font-bold text-white mb-6">Your Best Week in 6 Months</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="border-l border-primary/40 pl-3">
+<p class="text-xs text-slate-400 font-medium">Net P&amp;L</p>
+<p class="text-lg font-mono font-bold text-primary">+$2,140.00</p>
+</div>
+<div class="border-l border-primary/40 pl-3">
+<p class="text-xs text-slate-400 font-medium">Win Rate</p>
+<p class="text-lg font-mono font-bold text-white">71%</p>
+</div>
+<div class="col-span-2 border-l border-primary/40 pl-3">
+<p class="text-xs text-slate-400 font-medium">Best Setup</p>
+<p class="text-lg font-mono font-bold text-white uppercase tracking-tight">Breakout</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Insight Feed -->
+<section class="p-4 space-y-4">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-bold uppercase tracking-widest text-slate-500">Insight Feed</h3>
+<span class="material-symbols-outlined text-slate-400 text-sm">filter_list</span>
+</div>
+<!-- Card 1: Risk -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-lg p-4 transition-all">
+<div class="flex items-center gap-2 mb-3">
+<span class="px-2 py-0.5 rounded bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-bold uppercase tracking-tight border border-orange-500/20">Risk</span>
+</div>
+<h4 class="text-base font-bold mb-2">Over-leveraging on Mondays</h4>
+<p class="text-sm italic text-slate-600 dark:text-slate-400 mb-4 font-display">
+                    "Data shows your position sizes are 24% larger during the Monday London open, leading to higher drawdowns compared to mid-week sessions."
+                </p>
+<a class="text-xs font-bold text-primary flex items-center gap-1 hover:underline" href="#">
+                    View related trades <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</a>
+</div>
+<!-- Card 2: Performance -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-lg p-4 transition-all">
+<div class="flex items-center gap-2 mb-3">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tight border border-primary/20">Performance</span>
+</div>
+<h4 class="text-base font-bold mb-2">Scalping Efficiency</h4>
+<p class="text-sm italic text-slate-600 dark:text-slate-400 mb-4 font-display">
+                    "Your profit factor on sub-15 minute charts has improved to 1.8 this month. You are finding cleaner exits in highly volatile zones."
+                </p>
+<a class="text-xs font-bold text-primary flex items-center gap-1 hover:underline" href="#">
+                    View related trades <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</a>
+</div>
+<!-- Card 3: Psychology -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-lg p-4 transition-all">
+<div class="flex items-center gap-2 mb-3">
+<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-tight border border-blue-500/20">Psychology</span>
+</div>
+<h4 class="text-base font-bold mb-2">Consistency Streak</h4>
+<p class="text-sm italic text-slate-600 dark:text-slate-400 mb-4 font-display">
+                    "You've adhered to your stop-loss rules for 12 consecutive trades. This emotional discipline is the primary driver for your recent P&amp;L growth."
+                </p>
+<a class="text-xs font-bold text-primary flex items-center gap-1 hover:underline" href="#">
+                    View related trades <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</a>
+</div>
+</section>
+<!-- AI Chat Section -->
+<section class="p-4 mt-4">
+<div class="border border-primary/20 rounded-xl p-5 bg-primary/5">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">chat_bubble</span>
+<h3 class="text-sm font-bold uppercase tracking-widest text-slate-200">Ask your data</h3>
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<button class="px-3 py-2 rounded-full border border-primary/30 text-xs font-medium hover:bg-primary/10 text-slate-400 hover:text-primary transition-all">
+                        When do I trade best?
+                    </button>
+<button class="px-3 py-2 rounded-full border border-primary/30 text-xs font-medium hover:bg-primary/10 text-slate-400 hover:text-primary transition-all">
+                        What's my best setup?
+                    </button>
+<button class="px-3 py-2 rounded-full border border-primary/30 text-xs font-medium hover:bg-primary/10 text-slate-400 hover:text-primary transition-all">
+                        Compare to last month
+                    </button>
+</div>
+<div class="relative">
+<input class="w-full bg-background-dark border border-primary/30 rounded-lg py-3 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600" placeholder="Type a question..." type="text"/>
+<button class="absolute right-2 top-1.5 p-1.5 bg-primary rounded-md text-white">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 h-[68px] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50 px-2">
+<div class="max-w-2xl mx-auto flex items-center justify-between px-2"><div class="max-w-2xl mx-auto h-full flex items-center justify-between">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-[24px]">book_2</span>
+<span class="text-[10px] font-medium">Trades</span>
+</a>
+<div class="flex flex-1 flex-col items-center justify-center">
+<button class="w-10 h-10 rounded-full bg-slate-900 dark:bg-slate-50 flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white dark:text-slate-900 text-[24px]">add</span>
+</button>
+<span class="text-[10px] font-medium mt-1 text-slate-500 dark:text-slate-400">New</span>
+</div>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px] fill-1">auto_awesome</span>
+<span class="text-[10px] font-bold">Insights</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div></div>
+</nav>
+</body></html>

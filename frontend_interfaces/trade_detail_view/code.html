@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Geist+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0a0f0c",
+                        "surface": "#121d16",
+                        "border-default": "#1e3126",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- Top Navigation -->
+<nav class="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-border-default/50">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h2 class="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100 uppercase">BTC / USD</h2>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">ID: #TR-98241</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-primary/30">WIN</span>
+</div>
+</nav>
+<main class="max-w-3xl mx-auto px-6 py-12 space-y-16">
+<!-- Hero Section -->
+<section class="text-center space-y-4">
+<p class="text-xs font-semibold tracking-[0.2em] text-slate-500 dark:text-slate-400 uppercase">Net P&amp;L</p>
+<h1 class="text-6xl md:text-7xl font-mono font-bold text-primary tracking-tighter">
+                +$1,420.50
+            </h1>
+</section>
+<!-- Key Metrics Grid -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-px bg-border-default border border-border-default overflow-hidden rounded-xl">
+<div class="bg-background-light dark:bg-surface p-6 flex flex-col gap-2">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Entry</p>
+<p class="text-xl font-mono font-medium text-slate-900 dark:text-slate-100">$41,430.00</p>
+</div>
+<div class="bg-background-light dark:bg-surface p-6 flex flex-col gap-2">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Exit</p>
+<p class="text-xl font-mono font-medium text-slate-900 dark:text-slate-100">$42,850.40</p>
+</div>
+<div class="bg-background-light dark:bg-surface p-6 flex flex-col gap-2">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Size</p>
+<p class="text-xl font-mono font-medium text-slate-900 dark:text-slate-100">1.24 BTC</p>
+</div>
+<div class="bg-background-light dark:bg-surface p-6 flex flex-col gap-2">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400">R:R</p>
+<p class="text-xl font-mono font-medium text-slate-900 dark:text-slate-100">1:3.4</p>
+</div>
+</section>
+<!-- Timeline -->
+<section class="space-y-6">
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Timeline</h3>
+<div class="relative flex items-center justify-between">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-mono text-slate-900 dark:text-slate-100">Oct 24, 09:14 AM</p>
+<span class="text-[10px] uppercase text-slate-500">Entry Date</span>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
+<div class="h-px w-24 bg-border-default mb-2"></div>
+<div class="bg-slate-200 dark:bg-white/5 px-3 py-1 rounded-full border border-border-default">
+<span class="text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">5h 12m</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<p class="text-sm font-mono text-slate-900 dark:text-slate-100">Oct 24, 02:26 PM</p>
+<span class="text-[10px] uppercase text-slate-500">Exit Date</span>
+</div>
+</div>
+</section>
+<!-- Classification & AI Analysis -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Classification -->
+<div class="space-y-6">
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Classification</h3>
+<div class="space-y-4 bg-surface/50 border border-border-default p-6 rounded-xl">
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase rounded tracking-tight border border-primary/20">Breakout</span>
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase rounded tracking-tight border border-primary/20">Trend Following</span>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-border-default/30">
+<div>
+<p class="text-[10px] uppercase text-slate-500 mb-1">Session</p>
+<p class="text-sm font-medium">London</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-slate-500 mb-1">Emotional State</p>
+<p class="text-sm font-medium">Focused</p>
+</div>
+</div>
+<div class="pt-4 border-t border-border-default/30">
+<p class="text-[10px] uppercase text-slate-500 mb-2">Trade Rating</p>
+<div class="flex gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Analysis -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">AI Analysis</h3>
+<span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+</div>
+<div class="italic text-slate-600 dark:text-slate-300 leading-relaxed text-sm bg-primary/5 p-6 rounded-xl border border-primary/10">
+                    "This trade followed your breakout setup pattern with high precision. The volume confirmation at the $41,500 level provided strong conviction. Your exit was timed perfectly near the first major resistance, capturing 85% of the local move. Consider reducing size if volatility increases above 4%."
+                </div>
+</div>
+</section>
+<!-- Screenshots -->
+<section class="space-y-6">
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Screenshots</h3>
+<div class="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+<div class="flex-none w-80 h-48 rounded-xl overflow-hidden border border-border-default bg-surface relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50"></div>
+<img class="w-full h-full object-cover" data-alt="Technical analysis chart with green price action" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9uyxXSfpesG7i2OBBuKWc5SYvQQcgJQzPsY8Wa1fT2e-G7_yqYwZ_CH1-mcORcB99ki6KkIZMt9LE4rVcRFGUdFzJZJ-7NF1_69OHICCVKvUTO1zOSf3sRcQCzfBXEQ-LkJ10bNTxPFglAc2bzx_6tzdXq9zIQvpisYibHW9JHAUTR_lVGbD65wrAWI_Ofpa2IG0vmYJerg215lUmcJF8D9Apbcjj1n0QSitSuieJE-hPiLVn4jCesVMZaWO4FtoirzqHk7a0PUfg"/>
+<div class="absolute bottom-3 left-3 bg-background-dark/80 px-2 py-1 rounded text-[10px] font-mono">15m timeframe</div>
+</div>
+<div class="flex-none w-80 h-48 rounded-xl overflow-hidden border border-border-default bg-surface relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50"></div>
+<img class="w-full h-full object-cover" data-alt="Bullish candlestick pattern on a dark trading interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCEkc_9OoERch_2Jx_2j6_C3aTzz10iKOr1Q_cM_UXoWn4tRyRCwMSkUD0gb_fycgcA6O5wgdLN0O3SYmDadz2erahc_UO7bvh0xpGkTJp9ZV1waY0OjeRAJC1IDjK_NDch5URXBBsGbPz_6ukVLVxNkzUXUmGtgj6fomMXJkNZtH5OApoV5vO479LChWLkF0MnehfcqSHIHWf7Jn9ddx81DVc2WbSI7aOiFGe9gLLszPTtN3F2Su4IK_15IEaSUZvZq0qtCxGDY0h"/>
+<div class="absolute bottom-3 left-3 bg-background-dark/80 px-2 py-1 rounded text-[10px] font-mono">1h entry signal</div>
+</div>
+<div class="flex-none w-80 h-48 rounded-xl overflow-hidden border border-border-default bg-surface relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50"></div>
+<img class="w-full h-full object-cover" data-alt="Exit point marked on a trading chart" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBOdzn0CSmg3CrNVnTd-L3dcaXwgtaCait3yYmmAbVo7if07pSXI-PHNLusfRTX_r4WUzEUUODU9UFIBGH8bVlBirYEy3u6Qq3X71_qtRLjZQclQeAqlTHSjQB-SrwIIeIGIhI-f_Xe80jeMX9u4zQXkq01LzebLUj5mWkPRDovwEJkY4cTk7mddvwpMxDwB3ukvv4Yosets27Ge8pDVl5AA-qsAQlDh0ZgnoXg7BVbLTQ3g3b7nZruSIg4PQi9y3Gi9qkGk7BqFiZ"/>
+<div class="absolute bottom-3 left-3 bg-background-dark/80 px-2 py-1 rounded text-[10px] font-mono">Exit confirmation</div>
+</div>
+</div>
+</section>
+<!-- Notes -->
+<section class="space-y-6">
+<h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Notes &amp; Rationale</h3>
+<div class="prose prose-invert max-w-none">
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-l-2 border-primary/30 pl-6">
+                    Entered based on a 4-hour range breakout. BTC had been consolidating for 12 days. The volume profile showed low resistance above $41.5k. I kept my stop loss tight at $41,200. The trade developed faster than expected during the London session open. Trailed the stop manually once we cleared $42,200. Exited as we hit the daily ATR target.
+                </p>
+</div>
+</section>
+<!-- Bottom Actions -->
+<section class="pt-12 pb-24 flex items-center gap-4">
+<button class="flex-1 flex items-center justify-center gap-2 py-4 border border-border-default rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+<span class="material-symbols-outlined text-lg text-slate-400 group-hover:text-slate-100">edit</span>
+<span class="text-sm font-bold uppercase tracking-widest">Edit Trade</span>
+</button>
+<button class="flex-1 flex items-center justify-center gap-2 py-4 border border-border-default rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
+<span class="material-symbols-outlined text-lg text-slate-400 group-hover:text-slate-100">share</span>
+<span class="text-sm font-bold uppercase tracking-widest">Share Entry</span>
+</button>
+</section>
+</main>
+</body></html>

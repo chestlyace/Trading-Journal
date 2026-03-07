@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#09090b",
+                        "border-muted": "#27272a",
+                        "surface-muted": "#18181b"
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .mono-text {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-border-muted px-4 py-4">
+<div class="max-w-2xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Profile Information</h1>
+</div>
+<div class="w-6"></div> <!-- Spacer for balance -->
+</div>
+</header>
+<main class="flex-1 w-full max-w-2xl mx-auto px-4 py-8">
+<!-- Avatar Section -->
+<section class="flex flex-col items-center gap-6 mb-12">
+<div class="relative group">
+<div class="size-20 rounded-full border border-border-muted flex items-center justify-center bg-surface-muted overflow-hidden">
+<!-- Avatar Image or Initials -->
+<div class="text-2xl font-bold text-primary">AT</div>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" data-alt="User profile avatar placeholder">
+<span class="material-symbols-outlined text-white">photo_camera</span>
+</div>
+</div>
+</div>
+<button class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors px-4 py-1.5 border border-border-muted rounded">
+                Change photo
+            </button>
+</section>
+<!-- Form Fields -->
+<div class="space-y-8">
+<!-- Display Name -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Display Name</label>
+<input class="w-full bg-transparent border border-border-muted rounded-none px-4 py-3 focus:border-primary focus:ring-0 text-base transition-all placeholder:text-slate-600" type="text" value="Alex Trader"/>
+</div>
+<!-- Email (Read Only) -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Email Address</label>
+<a class="text-xs font-bold text-primary hover:underline underline-offset-4" href="#">Change email</a>
+</div>
+<div class="w-full border border-border-muted bg-surface-muted/50 rounded-none px-4 py-3 text-slate-400 select-none mono-text">
+                    alex.trader@tradge.io
+                </div>
+</div>
+<!-- Timezone -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Timezone</label>
+<div class="relative">
+<select class="w-full appearance-none bg-transparent border border-border-muted rounded-none px-4 py-3 pr-10 focus:border-primary focus:ring-0 text-base transition-all">
+<option value="UTC">UTC (GMT+0)</option>
+<option value="EST">Eastern Standard Time (GMT-5)</option>
+<option value="PST">Pacific Standard Time (GMT-8)</option>
+<option value="CET">Central European Time (GMT+1)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">expand_more</span>
+</div>
+</div>
+<!-- Home Currency -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Home Currency</label>
+<div class="relative">
+<select class="w-full appearance-none bg-transparent border border-border-muted rounded-none px-4 py-3 pr-10 focus:border-primary focus:ring-0 text-base transition-all mono-text">
+<option value="USD">USD - United States Dollar</option>
+<option value="EUR">EUR - Euro</option>
+<option value="GBP">GBP - British Pound</option>
+<option value="JPY">JPY - Japanese Yen</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">expand_more</span>
+</div>
+</div>
+<!-- Trading Style -->
+<div class="space-y-3">
+<label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Trading Style</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 border border-primary bg-primary/10 text-primary text-sm font-medium transition-colors">
+                        Day Trader
+                    </button>
+<button class="px-4 py-2 border border-border-muted hover:border-slate-500 text-slate-400 text-sm font-medium transition-colors">
+                        Swing Trader
+                    </button>
+<button class="px-4 py-2 border border-primary bg-primary/10 text-primary text-sm font-medium transition-colors">
+                        Scalper
+                    </button>
+<button class="px-4 py-2 border border-border-muted hover:border-slate-500 text-slate-400 text-sm font-medium transition-colors">
+                        Position Trader
+                    </button>
+<button class="px-4 py-2 border border-border-muted hover:border-slate-500 text-slate-400 text-sm font-medium transition-colors">
+                        Momentum
+                    </button>
+</div>
+</div>
+</div>
+<div class="h-24"></div> <!-- Footer Spacer -->
+</main>
+<!-- Sticky Footer -->
+<footer class="fixed bottom-0 left-0 right-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-t border-slate-200 dark:border-border-muted px-4 py-4">
+<div class="max-w-2xl mx-auto">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-none transition-colors uppercase tracking-widest text-sm">
+                Save Changes
+            </button>
+</div>
+</footer>
+</body></html>

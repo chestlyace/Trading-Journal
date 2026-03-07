@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tradge - Tags &amp; Templates</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#09090B",
+                        "border-muted": "#27272A",
+                        "text-main": "#FAFAFA",
+                        "text-muted": "#A1A1AA",
+                    },
+                    fontFamily: {
+                        "display": ["Geist", "Manrope", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Geist', sans-serif;
+        }
+        .mono {
+            font-family: 'Geist Mono', monospace;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-main min-h-screen">
+<div class="max-w-md mx-auto min-h-screen flex flex-col border-x border-border-muted bg-background-dark">
+<!-- Header -->
+<header class="flex items-center px-4 py-6 border-b border-border-muted justify-between">
+<div class="flex items-center gap-3">
+<button class="text-text-main hover:text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-xl font-semibold tracking-tight">Settings</h1>
+</div>
+<button class="text-text-muted hover:text-text-main">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<!-- Navigation Tabs -->
+<nav class="px-4 pt-4">
+<h2 class="text-sm font-medium text-text-muted uppercase tracking-widest mb-4">Configuration</h2>
+<div class="flex border-b border-border-muted gap-6">
+<a class="pb-3 border-b-2 border-primary text-text-main text-sm font-medium flex items-center gap-2" href="#">
+                    Strategy Tags
+                    <span class="mono text-[10px] bg-border-muted px-1.5 py-0.5 rounded">08</span>
+</a>
+<a class="pb-3 border-b-2 border-transparent text-text-muted hover:text-text-main text-sm font-medium transition-all" href="#">
+                    Mistake Tags
+                </a>
+</div>
+</nav>
+<!-- Content Area -->
+<main class="flex-1 px-4 py-8">
+<!-- Add Tag Input -->
+<section class="mb-8">
+<div class="flex gap-2">
+<div class="relative flex-1">
+<input class="w-full bg-background-dark border border-border-muted rounded-lg py-3 px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-text-main placeholder:text-text-muted transition-all" placeholder="Add custom strategy tag..." type="text"/>
+</div>
+<button class="bg-text-main text-background-dark px-4 rounded-lg flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</section>
+<!-- Active Tags List -->
+<section class="mb-10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-text-muted uppercase tracking-wider">Active Strategy Tags</h3>
+<span class="text-[10px] mono text-text-muted">DRAG TO REORDER</span>
+</div>
+<div class="space-y-2">
+<!-- Tag Item -->
+<div class="flex items-center justify-between p-3 border border-border-muted rounded-lg bg-white/5 hover:border-primary/50 transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-muted text-sm cursor-grab">drag_indicator</span>
+<span class="text-sm font-medium">Inside Bar Breakout</span>
+</div>
+<button class="text-text-muted opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-3 border border-border-muted rounded-lg bg-white/5 hover:border-primary/50 transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-muted text-sm cursor-grab">drag_indicator</span>
+<span class="text-sm font-medium">VWAP Bounce</span>
+</div>
+<button class="text-text-muted opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-3 border border-border-muted rounded-lg bg-white/5 hover:border-primary/50 transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-text-muted text-sm cursor-grab">drag_indicator</span>
+<span class="text-sm font-medium">Fibonacci Retracement</span>
+</div>
+<button class="text-text-muted opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Strategy Templates -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-text-muted uppercase tracking-wider">Strategy Templates</h3>
+</div>
+<div class="grid grid-cols-1 gap-3">
+<!-- Template Card -->
+<div class="p-4 border border-border-muted rounded-xl bg-background-dark hover:bg-white/5 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold text-text-main group-hover:text-primary">Breakout Trading</h4>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary">download</span>
+</div>
+<p class="text-xs text-text-muted leading-relaxed">Standard set for volatility-based entry points and consolidation exits.</p>
+<div class="mt-3 flex flex-wrap gap-2">
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">Consolidation</span>
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">Volume Spike</span>
+</div>
+</div>
+<div class="p-4 border border-border-muted rounded-xl bg-background-dark hover:bg-white/5 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold text-text-main group-hover:text-primary">Trend Following</h4>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary">download</span>
+</div>
+<p class="text-xs text-text-muted leading-relaxed">Momentum-based strategy focusing on long-term directional moves.</p>
+<div class="mt-3 flex flex-wrap gap-2">
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">MA-Cross</span>
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">Pullback</span>
+</div>
+</div>
+<div class="p-4 border border-border-muted rounded-xl bg-background-dark hover:bg-white/5 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold text-text-main group-hover:text-primary">Mean Reversion</h4>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary">download</span>
+</div>
+<p class="text-xs text-text-muted leading-relaxed">Statistical edge targeting returning to average price points.</p>
+<div class="mt-3 flex flex-wrap gap-2">
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">Overbought</span>
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">Oversold</span>
+</div>
+</div>
+<div class="p-4 border border-border-muted rounded-xl bg-background-dark hover:bg-white/5 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold text-text-main group-hover:text-primary">News Trading</h4>
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary">download</span>
+</div>
+<p class="text-xs text-text-muted leading-relaxed">Quick execution tags for high-impact economic calendar events.</p>
+<div class="mt-3 flex flex-wrap gap-2">
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">CPI</span>
+<span class="text-[10px] mono border border-border-muted px-2 py-0.5 rounded text-text-muted uppercase">Earnings</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<footer class="mt-auto border-t border-border-muted bg-background-dark px-4 py-2">
+<div class="flex justify-between items-center max-w-sm mx-auto">
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Journal</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Analytics</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Assets</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">settings</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Settings</span>
+</a>
+</div>
+</footer>
+</div>
+</body></html>

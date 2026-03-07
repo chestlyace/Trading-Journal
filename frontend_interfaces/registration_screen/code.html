@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tradge - Sign Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#16a24e",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#09090b",
+                        "border-default": "#27272a",
+                        "bg-inset": "#18181b",
+                    },
+                    fontFamily: {
+                        "display": ["Geist", "sans-serif"],
+                        "mono": ["Geist Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .mono-text {
+            font-family: 'Geist Mono', monospace;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation -->
+<nav class="flex items-center p-4 justify-between border-b border-border-default">
+<button class="text-slate-900 dark:text-slate-100 p-2 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="text-sm font-semibold tracking-tight uppercase">Tradge</span>
+<div class="w-10"></div> <!-- Spacer -->
+</nav>
+<!-- Main Content -->
+<main class="flex-1 px-6 py-8 max-w-md mx-auto w-full">
+<!-- Header Section -->
+<header class="mb-8">
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Create your account</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Start journaling in 2 minutes</p>
+</header>
+<!-- Registration Form -->
+<form class="space-y-5">
+<!-- Full Name -->
+<div class="space-y-1.5">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" for="full-name">Full Name</label>
+<input class="w-full h-12 bg-white dark:bg-bg-inset border border-slate-200 dark:border-border-default rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-600" id="full-name" placeholder="John Doe" type="text"/>
+</div>
+<!-- Email Address -->
+<div class="space-y-1.5">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" for="email">Email</label>
+<input class="w-full h-12 bg-white dark:bg-bg-inset border border-slate-200 dark:border-border-default rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-600" id="email" placeholder="name@example.com" type="email"/>
+</div>
+<!-- Password -->
+<div class="space-y-1.5">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" for="password">Password</label>
+<div class="relative">
+<input class="w-full h-12 bg-white dark:bg-bg-inset border border-slate-200 dark:border-border-default rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-600" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-100" type="button">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+<!-- Password Strength Indicator -->
+<div class="pt-2">
+<div class="flex gap-1.5 h-1 w-full">
+<div class="flex-1 bg-primary rounded-full"></div>
+<div class="flex-1 bg-primary rounded-full"></div>
+<div class="flex-1 bg-primary rounded-full"></div>
+<div class="flex-1 bg-slate-200 dark:bg-border-default rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-1.5">
+<span class="text-[10px] font-mono uppercase tracking-widest text-primary">Strong</span>
+<span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">8+ Characters</span>
+</div>
+</div>
+</div>
+<!-- Confirm Password -->
+<div class="space-y-1.5">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" for="confirm-password">Confirm Password</label>
+<input class="w-full h-12 bg-white dark:bg-bg-inset border border-slate-200 dark:border-border-default rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-zinc-600" id="confirm-password" placeholder="••••••••" type="password"/>
+</div>
+<!-- TOS Checkbox -->
+<div class="flex items-start gap-3 py-2">
+<input class="mt-0.5 rounded border-slate-200 dark:border-border-default bg-white dark:bg-bg-inset text-primary focus:ring-primary" id="tos" type="checkbox"/>
+<label class="text-[13px] leading-tight text-slate-600 dark:text-slate-400" for="tos">
+                    I agree to the <a class="underline text-slate-900 dark:text-slate-100" href="#">Terms of Service</a> and <a class="underline text-slate-900 dark:text-slate-100" href="#">Privacy Policy</a>
+</label>
+</div>
+<!-- CTA Button -->
+<button class="w-full h-12 bg-slate-900 dark:bg-slate-100 text-slate-100 dark:text-slate-900 font-bold rounded-lg transition-transform active:scale-[0.98] mt-4" type="submit">
+                Create account
+            </button>
+</form>
+<!-- Divider -->
+<div class="relative my-10">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-slate-200 dark:border-border-default"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase">
+<span class="bg-background-light dark:bg-background-dark px-3 text-slate-500 font-mono tracking-widest">or</span>
+</div>
+</div>
+<!-- Social Auth -->
+<button class="w-full h-12 border border-slate-200 dark:border-border-default bg-white dark:bg-bg-inset text-slate-900 dark:text-slate-100 font-semibold rounded-lg flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.24.81-.6z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+            Continue with Google
+        </button>
+<!-- Footer Link -->
+<footer class="mt-12 text-center">
+<p class="text-[14px] text-slate-500 dark:text-slate-400">
+                Already have an account? 
+                <a class="text-slate-900 dark:text-slate-100 font-bold ml-1 hover:underline" href="#">Sign in</a>
+</p>
+</footer>
+</main>
+<!-- Navigation Mock (Bottom) -->
+<div class="mt-auto border-t border-border-default bg-white dark:bg-bg-inset px-6 py-4 flex justify-between items-center">
+<div class="flex-1 flex justify-center text-slate-400">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div class="flex-1 flex justify-center text-slate-400">
+<span class="material-symbols-outlined">show_chart</span>
+</div>
+<div class="flex-1 flex justify-center">
+<div class="bg-primary w-12 h-12 rounded-full flex items-center justify-center text-white -mt-10 border-4 border-background-dark">
+<span class="material-symbols-outlined">add</span>
+</div>
+</div>
+<div class="flex-1 flex justify-center text-slate-400">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<div class="flex-1 flex justify-center text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">person</span>
+</div>
+</div>
+</body></html>
