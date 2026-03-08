@@ -13,7 +13,12 @@ import {
 } from 'react-native'
 import { supabase } from '../../src/lib/supabase'
 import { router } from 'expo-router'
+import * as WebBrowser from 'expo-web-browser'
+import * as Linking from 'expo-linking'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { useAuthStore } from '../../src/stores/auth.store'
+
+WebBrowser.maybeCompleteAuthSession()
 
 const theme = {
     primary: '#16a24e',
@@ -55,6 +60,8 @@ export default function RegisterScreen() {
     // Basic password strength: 1 bar per 2 chars, max 4
     const passwordStrength = Math.min(Math.max(Math.floor(password.length / 2), 0), 4)
 
+    const initialize = useAuthStore((s) => s.initialize)
+
     const onSubmit = async () => {
         if (!fullName || !email || !password || !confirmPassword) {
             setError('Please fill in all fields.')
@@ -82,13 +89,51 @@ export default function RegisterScreen() {
             },
         })
 
-        setIsLoading(false)
-
         if (signUpError) {
+            setIsLoading(false)
             setError(signUpError.message)
         } else {
-            // Typically direct to tabs or a verification screen
+            await initialize()
+            setIsLoading(false)
             router.replace('/(tabs)')
+        }
+    }
+
+    const onGoogleSignIn = async () => {
+        setIsLoading(true)
+        setError(null)
+        try {
+            const redirectUrl = Linking.createURL('/(tabs)')
+            const { data, error: signInError } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: redirectUrl,
+                },
+            })
+            if (signInError) throw signInError
+
+            if (data?.url) {
+                const res = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl)
+                if (res.type === 'success' && res.url) {
+                    const parsedUrl = res.url.replace('#', '?')
+                    const parsed = Linking.parse(parsedUrl)
+                    const access_token = parsed.queryParams?.access_token
+                    const refresh_token = parsed.queryParams?.refresh_token
+
+                    if (typeof access_token === 'string' && typeof refresh_token === 'string') {
+                        const { error: sessionError } = await supabase.auth.setSession({
+                            access_token,
+                            refresh_token,
+                        })
+                        if (sessionError) throw sessionError
+                        router.replace('/(tabs)')
+                    }
+                }
+            }
+        } catch (err: any) {
+            setError(err.message)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -299,12 +344,15 @@ export default function RegisterScreen() {
 
                     {/* Social Login */}
                     <TouchableOpacity
+                        onPress={onGoogleSignIn}
+                        disabled={isLoading}
                         style={[
                             styles.googleButton,
                             {
                                 backgroundColor: colors.bgInset,
                                 borderColor: colors.border,
                             },
+                            isLoading && styles.signInButtonDisabled,
                         ]}
                     >
                         <Ionicons name="logo-google" size={18} color={isDark ? '#f8fafc' : '#0f172a'} />

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#134b09", "background-light": "#f6f8f6", "background-dark": "#132111"}, fontFamily: {display: "Inter", mono: ["Geist Mono", "monospace"]}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        body { font-family: 'Geist', sans-serif; }
+        .mono-text { font-family: 'Geist Mono', monospace; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="max-w-md mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark border-x border-slate-200 dark:border-slate-800">
+<!-- TopAppBar -->
+<header class="flex items-center p-4 justify-between sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
+<div class="text-slate-900 dark:text-slate-100 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-sm font-medium leading-tight tracking-tight flex-1 text-center mono-text">Onboarding - Step 2</h1>
+<div class="w-6"></div>
+</header>
+<!-- Progress Indicator -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-6">
+<div class="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-primary"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+</div>
+<main class="flex-1 px-6 pb-12 flex flex-col">
+<!-- Title Section -->
+<div class="mb-10">
+<h2 class="text-slate-900 dark:text-slate-100 text-3xl font-semibold tracking-tight mb-2">Set your preferences</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Tailor Tradge to your specific trading methodology.</p>
+</div>
+<!-- Trading Style Section -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-xs font-bold uppercase tracking-widest mb-4 mono-text">Trading Style</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full border border-primary bg-primary/10 text-primary text-sm font-medium transition-colors">
+                        Day Trader
+                    </button>
+<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 bg-transparent text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
+                        Swing Trader
+                    </button>
+<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 bg-transparent text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
+                        Scalper
+                    </button>
+<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 bg-transparent text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
+                        Position Trader
+                    </button>
+</div>
+</section>
+<!-- Session Focus Section -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-xs font-bold uppercase tracking-widest mb-4 mono-text">Session Focus</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 bg-transparent text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
+                        London
+                    </button>
+<button class="px-4 py-2 rounded-full border border-primary bg-primary/10 text-primary text-sm font-medium transition-colors">
+                        New York
+                    </button>
+<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 bg-transparent text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
+                        Asian
+                    </button>
+<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 bg-transparent text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
+                        All Sessions
+                    </button>
+</div>
+</section>
+<!-- Home Currency Field -->
+<section class="mb-12">
+<h3 class="text-slate-900 dark:text-slate-100 text-xs font-bold uppercase tracking-widest mb-4 mono-text">Home Currency</h3>
+<div class="relative">
+<input class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-100 mono-text focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" readonly="" type="text" value="USD"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+<span class="material-symbols-outlined text-sm">lock</span>
+</div>
+</div>
+<p class="mt-2 text-[10px] text-slate-500 uppercase tracking-tight mono-text">Primary account base currency</p>
+</section>
+<!-- Spacer for flex layout -->
+<div class="flex-1"></div>
+<!-- CTA Button -->
+<footer class="mt-auto">
+<button class="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all">
+<span>Save Preferences</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="text-center mt-6 text-slate-400 dark:text-slate-600 text-xs mono-text">Step 2 of 3</p>
+</footer>
+</main>
+</div>
+</body></html>

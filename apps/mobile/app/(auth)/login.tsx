@@ -13,8 +13,13 @@ import {
 } from 'react-native'
 import { supabase } from '../../src/lib/supabase'
 import { router } from 'expo-router'
+import * as WebBrowser from 'expo-web-browser'
+import * as Linking from 'expo-linking'
 // Ionicons is built into Expo for the visibility toggle icon
 import { Ionicons } from '@expo/vector-icons'
+import { useAuthStore } from '../../src/stores/auth.store'
+
+WebBrowser.maybeCompleteAuthSession()
 
 // Core theme colors from the HTML
 const theme = {
@@ -50,6 +55,8 @@ export default function LoginScreen() {
   const isDark = colorScheme === 'dark'
   const colors = isDark ? theme.dark : theme.light
 
+  const initialize = useAuthStore((s) => s.initialize)
+
   const onSubmit = async () => {
     if (!email || !password) {
       setError('Please enter both email and password.')
@@ -62,12 +69,52 @@ export default function LoginScreen() {
       email,
       password,
     })
-    setIsLoading(false)
 
     if (signInError) {
+      setIsLoading(false)
       setError(signInError.message)
     } else {
+      await initialize()
+      setIsLoading(false)
       router.replace('/(tabs)')
+    }
+  }
+
+  const onGoogleSignIn = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const redirectUrl = Linking.createURL('/(tabs)')
+      const { data, error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+        },
+      })
+      if (signInError) throw signInError
+
+      if (data?.url) {
+        const res = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl)
+        if (res.type === 'success' && res.url) {
+          const parsedUrl = res.url.replace('#', '?')
+          const parsed = Linking.parse(parsedUrl)
+          const access_token = parsed.queryParams?.access_token
+          const refresh_token = parsed.queryParams?.refresh_token
+
+          if (typeof access_token === 'string' && typeof refresh_token === 'string') {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            })
+            if (sessionError) throw sessionError
+            router.replace('/(tabs)')
+          }
+        }
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -195,14 +242,17 @@ export default function LoginScreen() {
               <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
             </View>
 
-            {/* Social Login (Placeholder UX wise for now) */}
+            {/* Social Login */}
             <TouchableOpacity
+              onPress={onGoogleSignIn}
+              disabled={isLoading}
               style={[
                 styles.googleButton,
                 {
                   backgroundColor: isDark ? 'rgba(22, 162, 78, 0.1)' : '#f1f5f9',
                   borderColor: colors.border,
                 },
+                isLoading && styles.signInButtonDisabled,
               ]}
             >
               <Ionicons name="logo-google" size={18} color={isDark ? '#f1f5f9' : '#0f172a'} />

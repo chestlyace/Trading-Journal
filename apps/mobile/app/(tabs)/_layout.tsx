@@ -3,7 +3,7 @@ import { Tabs, Redirect } from 'expo-router'
 import { useAuthStore } from '../../src/stores/auth.store'
 
 export default function TabsLayout() {
-  const { session, isLoading, initialize } = useAuthStore()
+  const { session, profile, isLoading, initialize } = useAuthStore()
 
   useEffect(() => {
     initialize().catch(() => { })
@@ -15,6 +15,10 @@ export default function TabsLayout() {
 
   if (!session) {
     return <Redirect href="/(auth)/login" />
+  }
+
+  if (!profile || !profile.onboardingDone) {
+    return <Redirect href="/onboarding" />
   }
 
   return (

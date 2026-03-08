@@ -5,6 +5,7 @@ export interface UserProfile {
   timezone: string
   homeCurrency: string
   tradingStyle: string[]
+  sessionFocus: string[]
   onboardingDone: boolean
   aiAnalysisEnabled: boolean
   createdAt: string
