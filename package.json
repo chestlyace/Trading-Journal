@@ -1,6 +1,7 @@
 {
   "name": "tradge",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "dev:api": "turbo run dev --filter=@tradge/api",
