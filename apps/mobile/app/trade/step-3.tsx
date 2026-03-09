@@ -148,13 +148,26 @@ export default function NewTradeStep3() {
                     </View>
                 </View>
 
-                <TouchableOpacity
-                    style={styles.primaryBtn}
-                    onPress={() => router.push('/trade/step-4')}
-                >
-                    <Text style={styles.primaryBtnText}>Continue to Risk</Text>
-                    <MaterialIcons name="arrow-forward" size={20} color="#fff" />
-                </TouchableOpacity>
+                <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                        style={[styles.outlineBtn, isDark ? styles.borderDark : styles.borderLight]}
+                        onPress={() => {
+                            store.updateField('exitTime', '')
+                            store.updateField('exitPrice', '')
+                            router.push('/trade/step-4')
+                        }}
+                    >
+                        <Text style={[styles.outlineBtnText, { color: isDark ? '#f8fafc' : '#0f172a' }]}>Skip (Trade is open)</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.primaryBtnFlex}
+                        onPress={() => router.push('/trade/step-4')}
+                    >
+                        <Text style={styles.primaryBtnText}>Continue</Text>
+                        <MaterialIcons name="arrow-forward" size={20} color="#fff" />
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </KeyboardAvoidingView>
     )
@@ -207,8 +220,18 @@ const styles = StyleSheet.create({
     previewPnl: { fontSize: 36, fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
     previewSub: { fontSize: 12, opacity: 0.5, fontStyle: 'italic', marginTop: 12 },
 
-    primaryBtn: {
-        marginHorizontal: 24,
+    actionButtons: { flexDirection: 'row', gap: 16, marginHorizontal: 24 },
+    outlineBtn: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 20,
+        borderRadius: 12,
+        borderWidth: 1,
+    },
+    outlineBtnText: { fontSize: 13, fontWeight: 'bold' },
+    primaryBtnFlex: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

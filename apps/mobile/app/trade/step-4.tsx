@@ -28,7 +28,7 @@ export default function NewTradeStep4() {
     let potentialLoss = '—'
 
     if (entry > 0 && pos > 0) {
-        const units = pos / entry
+        const units = pos
         if (sl > 0) {
             const lossAmt = (store.direction === 'LONG') ? (entry - sl) * units : (sl - entry) * units
             if (lossAmt > 0) potentialLoss = `-$${lossAmt.toFixed(2)}`
@@ -74,7 +74,7 @@ export default function NewTradeStep4() {
 
                 <View style={styles.formSection}>
                     <View style={styles.field}>
-                        <Text style={styles.label}>Position Size (Total Value)</Text>
+                        <Text style={styles.label}>Position Size (Shares / Units / Lots)</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={[styles.inputPrimary, { color: isDark ? '#f8fafc' : '#0f172a' }, isDark ? styles.borderDark : styles.borderLight]}
@@ -84,7 +84,7 @@ export default function NewTradeStep4() {
                                 value={store.positionSize}
                                 onChangeText={(val) => store.updateField('positionSize', val)}
                             />
-                            <Text style={styles.unitRight}>USD</Text>
+                            <Text style={styles.unitRight}>UNITS</Text>
                         </View>
                     </View>
 

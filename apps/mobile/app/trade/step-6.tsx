@@ -34,14 +34,15 @@ export default function NewTradeStep6() {
     const exit = parseFloat(store.exitPrice) || 0
     const pos = parseFloat(store.positionSize) || 0
 
+    const isOpen = !store.exitPrice
     let netPnl = 0
-    if (entry > 0 && pos > 0 && exit > 0) {
-        const units = pos / entry
+    if (entry > 0 && pos > 0 && !isOpen) {
+        const units = pos
         netPnl = (store.direction === 'LONG') ? (exit - entry) * units : (entry - exit) * units
     }
 
-    const pnlDisplay = netPnl === 0 ? '—' : `${netPnl >= 0 ? '+' : '-'}$${Math.abs(netPnl).toFixed(2)}`
-    const pnlColor = netPnl === 0 ? '#64748b' : (netPnl > 0 ? '#16a24e' : '#ef4444')
+    const pnlDisplay = isOpen ? 'PENDING' : (netPnl === 0 ? '—' : `${netPnl >= 0 ? '+' : '-'}$${Math.abs(netPnl).toFixed(2)}`)
+    const pnlColor = isOpen ? '#64748b' : (netPnl === 0 ? '#64748b' : (netPnl > 0 ? '#16a24e' : '#ef4444'))
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -87,9 +88,9 @@ export default function NewTradeStep6() {
                 direction: store.direction,
                 entry_time: store.entryTime || new Date().toISOString(),
                 exit_time: store.exitTime || null,
-                entry_price: parseFloat(store.entryPrice) || null,
+                entry_price: parseFloat(store.entryPrice) || 0,
                 exit_price: parseFloat(store.exitPrice) || null,
-                position_size: parseFloat(store.positionSize) || null,
+                position_size: parseFloat(store.positionSize) || 0,
                 stop_loss: parseFloat(store.stopLoss) || null,
                 take_profit: parseFloat(store.takeProfit) || null,
                 fees: fees,
@@ -180,10 +181,10 @@ export default function NewTradeStep6() {
 
                 <View style={styles.formSection}>
                     <View style={styles.field}>
-                        <Text style={styles.label}>Trade Rationale</Text>
+                        <Text style={styles.label}>{isOpen ? 'Entry Rationale (Why confirm this?)' : 'Trade Rationale'}</Text>
                         <TextInput
                             style={[styles.textArea, { color: isDark ? '#f8fafc' : '#0f172a' }, isDark ? styles.borderDark : styles.borderLight]}
-                            placeholder="Add your trade rationale..."
+                            placeholder={isOpen ? "Why was this position taken..." : "Add your trade rationale..."}
                             placeholderTextColor={isDark ? '#475569' : '#94a3b8'}
                             multiline
                             textAlignVertical="top"
@@ -193,7 +194,7 @@ export default function NewTradeStep6() {
                     </View>
 
                     <View style={styles.field}>
-                        <Text style={styles.label}>Screenshots</Text>
+                        <Text style={styles.label}>{isOpen ? 'Entry Screenshots (Before trade)' : 'Screenshots'}</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
                             {images.map((img, index) => (
                                 <View key={index} style={styles.imgPreviewBox}>

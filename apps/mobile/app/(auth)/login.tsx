@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -15,41 +15,44 @@ import { supabase } from '../../src/lib/supabase'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import * as Linking from 'expo-linking'
-// Ionicons is built into Expo for the visibility toggle icon
 import { Ionicons } from '@expo/vector-icons'
 import { useAuthStore } from '../../src/stores/auth.store'
 
 WebBrowser.maybeCompleteAuthSession()
 
-// Core theme colors from the HTML
 const theme = {
   primary: '#16a24e',
   light: {
     bg: '#f6f8f7',
     surface: '#ffffff',
-    text: '#0f172a', // slate-900
-    textSecondary: '#475569', // slate-600
-    border: '#e2e8f0', // slate-200
-    inputPlaceholder: '#94a3b8', // slate-400
+    text: '#0f172a',
+    textSecondary: '#475569',
+    border: '#e2e8f0',
+    inputPlaceholder: '#94a3b8',
     divider: '#e2e8f0',
   },
   dark: {
     bg: '#112117',
     surface: '#1b3224',
-    text: '#f1f5f9', // slate-100
-    textSecondary: 'rgba(22, 162, 78, 0.7)', // primary/70
-    border: '#366348', // border-muted
-    inputPlaceholder: 'rgba(22, 162, 78, 0.4)', // primary/40
+    text: '#f1f5f9',
+    textSecondary: 'rgba(22, 162, 78, 0.7)',
+    border: '#366348',
+    inputPlaceholder: 'rgba(22, 162, 78, 0.4)',
     divider: '#366348',
   },
 }
-
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+
+  useEffect(() => {
+    // Cannot load storage in offline Expo Go without native MMKV bindings built.
+    setRememberMe(false)
+  }, [])
 
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
@@ -63,6 +66,7 @@ export default function LoginScreen() {
       return
     }
 
+    // In a real app we would persist to AsyncStorage or MMKV here.
     setIsLoading(true)
     setError(null)
     const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -130,9 +134,7 @@ export default function LoginScreen() {
       >
         <View style={styles.formContainer}>
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>
-              Welcome back
-            </Text>
+            <Text style={[styles.title, { color: colors.text }]}>Welcome back</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               Sign in to your journal
             </Text>
@@ -199,68 +201,76 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </View>
+          </View>
 
-            {/* Forgot Password */}
-            <View style={styles.forgotPasswordContainer}>
-              <TouchableOpacity>
-                <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-              </TouchableOpacity>
-            </View>
-
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-            {/* Primary Action */}
+          {/* Remember Me & Forgot Password */}
+          <View style={styles.actionsRow}>
             <TouchableOpacity
-              style={[
-                styles.signInButton,
-                { backgroundColor: isDark ? '#f1f5f9' : '#0f172a' },
-                isLoading && styles.signInButtonDisabled,
-              ]}
-              onPress={onSubmit}
+              style={styles.rememberMeContainer}
+              onPress={() => setRememberMe(!rememberMe)}
               disabled={isLoading}
             >
-              {isLoading ? (
-                <ActivityIndicator color={isDark ? '#0f172a' : '#ffffff'} />
-              ) : (
-                <Text
-                  style={[
-                    styles.signInButtonText,
-                    { color: isDark ? '#0f172a' : '#ffffff' },
-                  ]}
-                >
-                  Sign in
-                </Text>
-              )}
+              <View
+                style={[
+                  styles.checkbox,
+                  rememberMe && { backgroundColor: theme.primary, borderColor: theme.primary },
+                ]}
+              >
+                {rememberMe && <Ionicons name="checkmark" size={12} color="#fff" />}
+              </View>
+              <Text style={[styles.rememberMeText, { color: colors.text }]}>Remember me</Text>
             </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={styles.dividerContainer}>
-              <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
-              <Text style={[styles.dividerText, { color: colors.inputPlaceholder }]}>
-                OR
-              </Text>
-              <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
-            </View>
-
-            {/* Social Login */}
-            <TouchableOpacity
-              onPress={onGoogleSignIn}
-              disabled={isLoading}
-              style={[
-                styles.googleButton,
-                {
-                  backgroundColor: isDark ? 'rgba(22, 162, 78, 0.1)' : '#f1f5f9',
-                  borderColor: colors.border,
-                },
-                isLoading && styles.signInButtonDisabled,
-              ]}
-            >
-              <Ionicons name="logo-google" size={18} color={isDark ? '#f1f5f9' : '#0f172a'} />
-              <Text style={[styles.googleButtonText, { color: colors.text }]}>
-                Sign in with Google
-              </Text>
+            <TouchableOpacity>
+              <Text style={styles.forgotPasswordText}>Forgot password?</Text>
             </TouchableOpacity>
           </View>
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          {/* Primary Action */}
+          <TouchableOpacity
+            style={[
+              styles.signInButton,
+              { backgroundColor: isDark ? '#f1f5f9' : '#0f172a' },
+              isLoading && styles.signInButtonDisabled,
+            ]}
+            onPress={onSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={isDark ? '#0f172a' : '#ffffff'} />
+            ) : (
+              <Text style={[styles.signInButtonText, { color: isDark ? '#0f172a' : '#ffffff' }]}>
+                Sign in
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
+            <Text style={[styles.dividerText, { color: colors.inputPlaceholder }]}>OR</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
+          </View>
+
+          {/* Social Login */}
+          <TouchableOpacity
+            onPress={onGoogleSignIn}
+            disabled={isLoading}
+            style={[
+              styles.googleButton,
+              {
+                backgroundColor: isDark ? 'rgba(22, 162, 78, 0.1)' : '#f1f5f9',
+                borderColor: colors.border,
+              },
+              isLoading && styles.signInButtonDisabled,
+            ]}
+          >
+            <Ionicons name="logo-google" size={18} color={isDark ? '#f1f5f9' : '#0f172a'} />
+            <Text style={[styles.googleButtonText, { color: colors.text }]}>
+              Sign in with Google
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Footer */}
@@ -269,9 +279,7 @@ export default function LoginScreen() {
             Don't have an account?{' '}
           </Text>
           <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-            <Text style={[styles.footerLink, { color: colors.text }]}>
-              Sign up
-            </Text>
+            <Text style={[styles.footerLink, { color: colors.text }]}>Sign up</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -335,17 +343,39 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
   },
-  forgotPasswordContainer: {
-    alignItems: 'flex-end',
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: '#94a3b8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rememberMeText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   forgotPasswordText: {
     fontSize: 14,
     fontWeight: '500',
-    color: theme.primary,
+    color: '#16a24e',
   },
   errorText: {
-    color: '#ef4444', // red-500
+    color: '#ef4444',
     fontSize: 14,
+    marginTop: 16,
   },
   signInButton: {
     height: 56,

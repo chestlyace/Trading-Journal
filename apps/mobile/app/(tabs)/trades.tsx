@@ -11,6 +11,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native'
+import { router } from 'expo-router'
 import { MaterialIcons } from '@expo/vector-icons'
 import type { TradeFilters, Trade } from '@tradge/types'
 import { useTrades } from '../../src/hooks/useTrades'
@@ -29,11 +30,43 @@ export default function TradesScreen() {
   const trades = data?.data ?? []
   const total = data?.total ?? 0
 
+  const [timeFilterVal, setTimeFilterVal] = useState('All Time')
+
   const toggleOutcomeFilter = (outcome: any) => {
     setFilters((prev: TradeFilters) => ({
       ...prev,
+      isOpen: undefined,
       outcome: prev.outcome === outcome ? undefined : outcome
     }))
+  }
+
+  const togglePendingFilter = () => {
+    setFilters((prev: TradeFilters) => ({
+      ...prev,
+      outcome: undefined,
+      isOpen: prev.isOpen === true ? undefined : true
+    }))
+  }
+
+  const selectTimeRange = (range: string) => {
+    setTimeFilterVal(range)
+    const now = new Date()
+    let from: string | undefined = undefined
+
+    if (range === 'Today') {
+      now.setHours(0, 0, 0, 0)
+      from = now.toISOString()
+    } else if (range === 'This Week') {
+      now.setDate(now.getDate() - now.getDay())
+      now.setHours(0, 0, 0, 0)
+      from = now.toISOString()
+    } else if (range === 'This Month') {
+      now.setDate(1)
+      now.setHours(0, 0, 0, 0)
+      from = now.toISOString()
+    }
+
+    setFilters((prev: TradeFilters) => ({ ...prev, from }))
   }
 
   const renderTrade = ({ item }: { item: Trade }) => {
@@ -71,7 +104,13 @@ export default function TradesScreen() {
     const strategyTag = item.tags?.find((t: any) => t.tagType === 'STRATEGY')?.tagValue || item.tags?.[0]?.tagValue
 
     return (
-      <TouchableOpacity style={[styles.tradeRow, isDark ? styles.borderDark : styles.borderLight]} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={[styles.tradeRow, isDark ? styles.borderDark : styles.borderLight]}
+        activeOpacity={0.7}
+        onPress={() => {
+          router.push({ pathname: '/trade/[id]', params: { id: item.id } } as any)
+        }}
+      >
         <View style={[styles.stripe, { backgroundColor: stripeColor }]} />
         <View style={styles.tradeContent}>
 
@@ -122,10 +161,13 @@ export default function TradesScreen() {
             <MaterialIcons name="expand-more" size={16} color={filters.outcome ? '#fff' : (isDark ? '#f8fafc' : '#0f172a')} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.filterBtn, isDark ? styles.filterBtnDark : styles.filterBtnLight]}>
-            <MaterialIcons name="calendar-today" size={18} color={isDark ? '#f8fafc' : '#0f172a'} />
-            <Text style={[styles.filterText, isDark ? styles.textDark : styles.textLight]}>All Time</Text>
-            <MaterialIcons name="expand-more" size={16} color={isDark ? '#f8fafc' : '#0f172a'} />
+          <TouchableOpacity
+            style={[styles.filterBtn, isDark ? styles.filterBtnDark : styles.filterBtnLight, timeFilterVal !== 'All Time' ? styles.filterBtnActive : null]}
+            onPress={() => setIsFilterModalOpen(true)}
+          >
+            <MaterialIcons name="calendar-today" size={18} color={timeFilterVal !== 'All Time' ? '#fff' : (isDark ? '#f8fafc' : '#0f172a')} />
+            <Text style={[styles.filterText, timeFilterVal !== 'All Time' ? { color: '#fff' } : (isDark ? styles.textDark : styles.textLight)]}>{timeFilterVal}</Text>
+            <MaterialIcons name="expand-more" size={16} color={timeFilterVal !== 'All Time' ? '#fff' : (isDark ? '#f8fafc' : '#0f172a')} />
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -163,8 +205,14 @@ export default function TradesScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={[styles.filterSectionTitle, isDark ? styles.textSlate400 : styles.textSlate600]}>Outcome</Text>
+            <Text style={[styles.filterSectionTitle, isDark ? styles.textSlate400 : styles.textSlate600]}>Outcome & Status</Text>
             <View style={styles.filterGrid}>
+              <TouchableOpacity
+                style={[styles.modalFilterBtn, filters.isOpen === true ? styles.modalFilterBtnActive : (isDark ? styles.filterBtnDark : styles.filterBtnLight)]}
+                onPress={togglePendingFilter}
+              >
+                <Text style={[styles.filterText, filters.isOpen === true ? { color: '#fff' } : (isDark ? styles.textDark : styles.textLight)]}>PENDING</Text>
+              </TouchableOpacity>
               {(['WIN', 'LOSS', 'BREAK_EVEN'] as const).map(out => (
                 <TouchableOpacity
                   key={out}
@@ -172,6 +220,19 @@ export default function TradesScreen() {
                   onPress={() => toggleOutcomeFilter(out)}
                 >
                   <Text style={[styles.filterText, filters.outcome === out ? { color: '#fff' } : (isDark ? styles.textDark : styles.textLight)]}>{out === 'BREAK_EVEN' ? 'BE' : out}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={[styles.filterSectionTitle, isDark ? styles.textSlate400 : styles.textSlate600]}>Time Range</Text>
+            <View style={styles.filterGrid}>
+              {(['All Time', 'Today', 'This Week', 'This Month'] as const).map(range => (
+                <TouchableOpacity
+                  key={range}
+                  style={[styles.modalFilterBtn, timeFilterVal === range ? styles.modalFilterBtnActive : (isDark ? styles.filterBtnDark : styles.filterBtnLight)]}
+                  onPress={() => selectTimeRange(range)}
+                >
+                  <Text style={[styles.filterText, timeFilterVal === range ? { color: '#fff' } : (isDark ? styles.textDark : styles.textLight)]}>{range}</Text>
                 </TouchableOpacity>
               ))}
             </View>
