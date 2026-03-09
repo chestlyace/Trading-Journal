@@ -114,7 +114,7 @@ export default function ProfileScreen() {
 
     const initials = useCallback(() => {
         const name = profile?.displayName || user?.email || ''
-        return name.split(/\s+|@/).filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
+        return name.split(/\s+|@/).filter(Boolean).slice(0, 2).map((w: string) => w[0]?.toUpperCase()).join('')
     }, [profile, user])
 
     const toggleStyle = (style: string) => {
@@ -359,7 +359,7 @@ export default function ProfileScreen() {
                             {user?.email ?? ''}
                         </Text>
                         <View style={styles.heroBadges}>
-                            {(Array.isArray(profile?.tradingStyle) ? profile.tradingStyle : []).slice(0, 2).map(s => (
+                            {(Array.isArray(profile?.tradingStyle) ? profile.tradingStyle : []).slice(0, 2).map((s: string) => (
                                 <View key={s} style={styles.heroBadge}>
                                     <Text style={styles.heroBadgeText}>{s}</Text>
                                 </View>
@@ -381,7 +381,7 @@ export default function ProfileScreen() {
                     icon="account-balance-wallet"
                     label="Trading Accounts"
                     c={c}
-                    onPress={() => Alert.alert('Coming Soon', 'Trading accounts management will be available in a future update.')}
+                    onPress={() => router.push('/accounts' as any)}
                 />
                 <MenuItem
                     icon="label"
@@ -403,7 +403,7 @@ export default function ProfileScreen() {
                     icon="dark-mode"
                     label="Appearance"
                     c={c}
-                    onPress={() => Alert.alert('Coming Soon', 'Appearance settings coming soon.')}
+                    onPress={() => router.push('/appearance' as any)}
                 />
                 <MenuItem
                     icon="security"
