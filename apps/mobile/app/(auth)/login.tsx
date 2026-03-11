@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from 'react-native'
 import { supabase } from '../../src/lib/supabase'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import * as Linking from 'expo-linking'
@@ -50,8 +51,17 @@ export default function LoginScreen() {
   const [rememberMe, setRememberMe] = useState(false)
 
   useEffect(() => {
-    // Cannot load storage in offline Expo Go without native MMKV bindings built.
-    setRememberMe(false)
+    const loadRememberedData = async () => {
+      try {
+        const savedEmail = await AsyncStorage.getItem('remembered_email')
+        const savedRememberMe = await AsyncStorage.getItem('remember_me')
+        if (savedEmail) setEmail(savedEmail)
+        if (savedRememberMe === 'true') setRememberMe(true)
+      } catch (err) {
+        console.error('Error loading remembered data:', err)
+      }
+    }
+    loadRememberedData()
   }, [])
 
   const colorScheme = useColorScheme()
@@ -66,21 +76,34 @@ export default function LoginScreen() {
       return
     }
 
-    // In a real app we would persist to AsyncStorage or MMKV here.
     setIsLoading(true)
     setError(null)
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
 
-    if (signInError) {
+    try {
+      if (rememberMe) {
+        await AsyncStorage.setItem('remembered_email', email)
+        await AsyncStorage.setItem('remember_me', 'true')
+      } else {
+        await AsyncStorage.removeItem('remembered_email')
+        await AsyncStorage.setItem('remember_me', 'false')
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) {
+        setIsLoading(false)
+        setError(signInError.message)
+      } else {
+        await initialize()
+        setIsLoading(false)
+        router.replace('/(tabs)')
+      }
+    } catch (err: any) {
       setIsLoading(false)
-      setError(signInError.message)
-    } else {
-      await initialize()
-      setIsLoading(false)
-      router.replace('/(tabs)')
+      setError(err.message)
     }
   }
 
