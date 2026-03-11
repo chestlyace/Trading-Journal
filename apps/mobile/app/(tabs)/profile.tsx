@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MaterialIcons } from '@expo/vector-icons'
 import { supabase } from '../../src/lib/supabase'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useAuthStore } from '../../src/stores/auth.store'
 import { router } from 'expo-router'
 
@@ -164,6 +165,7 @@ export default function ProfileScreen() {
                         setLoggingOut(true)
                         try {
                             await supabase.auth.signOut()
+                            await AsyncStorage.multiRemove(['remembered_email', 'remember_me'])
                             router.replace('/(auth)/login')
                         } catch (err: any) {
                             Alert.alert('Error', err.message || 'Failed to sign out.')
