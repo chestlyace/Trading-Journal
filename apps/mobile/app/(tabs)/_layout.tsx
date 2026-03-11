@@ -51,7 +51,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }: { color: string; size: number }) => (
             <MaterialIcons name="home" size={24} color={color} />
           ),
         }}
@@ -60,7 +60,7 @@ export default function TabsLayout() {
         name="trades"
         options={{
           title: 'Trades',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }: { color: string; size: number }) => (
             <MaterialIcons name="bar-chart" size={24} color={color} />
           ),
         }}
@@ -84,8 +84,8 @@ export default function TabsLayout() {
             </View>
           ),
         }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
+        listeners={() => ({
+          tabPress: (e: any) => {
             e.preventDefault()
             router.push('/trade/new')
           },
@@ -95,7 +95,7 @@ export default function TabsLayout() {
         name="insights"
         options={{
           title: 'Insights',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }: { color: string; size: number }) => (
             <MaterialIcons name="lightbulb" size={24} color={color} />
           ),
         }}
@@ -104,7 +104,7 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }: { color: string; size: number }) => (
             <MaterialIcons name="person" size={24} color={color} />
           ),
         }}

@@ -4,15 +4,16 @@
     "jsx": "react-jsx",
     "types": [
       "react",
-      "react-native"
+      "react-native",
+      "node"
     ],
     "allowJs": true,
     "noEmit": false,
-    "outDir": "dist",
-    "rootDir": "src"
+    "outDir": "dist"
   },
   "include": [
     "src",
+    "app",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ]

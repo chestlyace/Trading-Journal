@@ -79,12 +79,13 @@ export default function OnboardingStep2() {
         try {
             const { error: updateError } = await supabase
                 .from('user_profiles')
-                .update({
+                .upsert({
+                    user_id: user.id,
+                    email: user.email,
                     trading_style: selectedStyles,
                     session_focus: selectedSessions,
                     onboarding_done: true,
                 })
-                .eq('user_id', user.id)
 
             if (updateError) {
                 console.error('Update profile error:', JSON.stringify(updateError))

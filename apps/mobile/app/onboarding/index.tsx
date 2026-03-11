@@ -95,6 +95,15 @@ export default function OnboardingScreen() {
                 throw new Error(`Account insert failed: ${insertError.message} (${insertError.code})`)
             }
 
+            // Ensure profile exists
+            await supabase.from('user_profiles').upsert({
+                user_id: user.id,
+                email: user.email,
+                home_currency: currency,
+            })
+
+            await refreshProfile()
+
             // Navigate to step 2 (preferences)
             router.push('/onboarding/step-2')
         } catch (err: any) {
