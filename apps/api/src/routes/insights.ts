@@ -29,7 +29,7 @@ const createSessionSchema = z.object({
 
 router.get('/', validate({ query: listQuerySchema }), async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as any as AuthenticatedRequest).userId
     const { page, pageSize } = req.query as any
     const result = await AIService.listInsights(userId, { page, pageSize })
     res.json(result)
@@ -40,7 +40,7 @@ router.get('/', validate({ query: listQuerySchema }), async (req, res, next) => 
 
 router.post('/generate', async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as any as AuthenticatedRequest).userId
     await AIService.generateInsights(userId)
     res.status(202).json({ status: 'queued' })
   } catch (err) {
@@ -52,7 +52,7 @@ router.post('/generate', async (req, res, next) => {
 
 router.get('/chat/sessions', async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as any as AuthenticatedRequest).userId
     const sessions = await AIService.listChatSessions(userId)
     res.json(sessions)
   } catch (err) {
@@ -65,7 +65,7 @@ router.post(
   validate({ body: createSessionSchema }),
   async (req, res, next) => {
     try {
-      const userId = (req as AuthenticatedRequest).userId
+      const userId = (req as any as AuthenticatedRequest).userId
       const session = await AIService.createChatSession(userId, req.body.title)
       res.status(201).json(session)
     } catch (err) {
@@ -76,7 +76,7 @@ router.post(
 
 router.get('/chat/sessions/:sessionId/history', async (req, res, next) => {
   try {
-    const userId = (req as unknown as AuthenticatedRequest).userId
+    const userId = (req as any as AuthenticatedRequest).userId
     const { sessionId } = req.params
     const history = await AIService.getChatHistory(sessionId, userId)
     res.json(history)
@@ -90,7 +90,7 @@ router.post(
   validate({ body: chatMessageSchema }),
   async (req, res, next) => {
     try {
-      const userId = (req as unknown as AuthenticatedRequest).userId
+      const userId = (req as any as AuthenticatedRequest).userId
       const { sessionId } = req.params
       const { message } = req.body
       const response = await AIService.sendMessage(userId, sessionId, message)
@@ -106,7 +106,7 @@ router.patch(
   validate({ body: updateBodySchema }),
   async (req, res, next) => {
     try {
-      const userId = (req as AuthenticatedRequest).userId
+      const userId = (req as any as AuthenticatedRequest).userId
       const id = req.params.id
       await AIService.updateInsight(userId, id, req.body)
       res.status(204).send()

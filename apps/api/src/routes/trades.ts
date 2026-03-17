@@ -63,7 +63,7 @@ const tradeFiltersSchema = z.object({
 
 router.get('/', validate({ query: tradeFiltersSchema }), async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as unknown as AuthenticatedRequest).userId
     const filters = req.query as any
     const result = await TradeService.list(userId, filters)
     res.json(result)
@@ -74,7 +74,7 @@ router.get('/', validate({ query: tradeFiltersSchema }), async (req, res, next) 
 
 router.post('/', validate({ body: createTradeSchema }), async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as unknown as AuthenticatedRequest).userId
     const trade = await TradeService.create(userId, req.body)
     res.status(201).json(trade)
   } catch (err) {
@@ -84,7 +84,7 @@ router.post('/', validate({ body: createTradeSchema }), async (req, res, next) =
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as any as AuthenticatedRequest).userId
     const trade = await TradeService.getById(userId, req.params.id)
     if (!trade) {
       return res
@@ -102,7 +102,7 @@ router.put(
   validate({ body: createTradeSchema.partial() }),
   async (req, res, next) => {
     try {
-      const userId = (req as AuthenticatedRequest).userId
+      const userId = (req as any as AuthenticatedRequest).userId
       const trade = await TradeService.update(userId, req.params.id, req.body)
       res.json(trade)
     } catch (err) {
@@ -113,7 +113,7 @@ router.put(
 
 router.delete('/:id', async (req, res, next) => {
   try {
-    const userId = (req as AuthenticatedRequest).userId
+    const userId = (req as any as AuthenticatedRequest).userId
     await TradeService.delete(userId, req.params.id)
     res.status(204).send()
   } catch (err) {
