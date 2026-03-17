@@ -25,11 +25,12 @@ const exportQuerySchema = z.object({
 router.get(
   '/excel',
   validate({ query: exportQuerySchema }),
-  async (req: AuthenticatedRequest, res: Response, next) => {
+  async (req: any, res: Response, next) => {
     try {
-      const { accountId, from, to, sheets } = req.query as any
+      const authReq = req as any as AuthenticatedRequest
+      const { accountId, from, to, sheets } = authReq.query as any
       const buffer = await ExportService.generateExcel({
-        userId: req.userId,
+        userId: authReq.userId,
         accountId,
         from,
         to,

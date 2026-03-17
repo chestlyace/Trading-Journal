@@ -29,7 +29,7 @@ export class ExportService {
       await this.addPerformanceSheet(workbook, trades)
     }
 
-    return (await workbook.xlsx.writeBuffer()) as Buffer
+    return (await workbook.xlsx.writeBuffer()) as any as Buffer
   }
 
   private static async fetchTrades(options: ExportOptions) {

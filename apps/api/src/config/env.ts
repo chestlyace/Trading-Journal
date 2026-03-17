@@ -12,6 +12,9 @@ const envSchema = z.object({
   // Anthropic
   ANTHROPIC_API_KEY: z.string().startsWith('sk-').optional(),
 
+  // Google Gemini
+  GOOGLE_GEMINI_API_KEY: z.string().optional(),
+
   // Resend (email)
   RESEND_API_KEY: z.string().optional(),
   FROM_EMAIL: z.string().email().default('no-reply@tradge.app'),
