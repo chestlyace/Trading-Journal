@@ -1,13 +1,16 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { supabaseAdmin } from '../lib/supabase'
 import { env } from '../config/env'
+import { NotificationService } from './notification.service'
 
-const anthropic = env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
+const genAI = env.GOOGLE_GEMINI_API_KEY
+  ? new GoogleGenerativeAI(env.GOOGLE_GEMINI_API_KEY)
   : null
 
+const MODEL_NAME = 'gemini-1.5-flash-latest' // Using 1.5 flash as requested (or lite if available in SDK)
+
 interface InsightCard {
-  type: 'PATTERN' | 'RISK_ALERT' | 'EMOTIONAL' | 'STRATEGY' | 'GOAL' | 'ANOMALY'
+  type: 'PATTERN' | 'RISK_ALERT' | 'EMOTIONAL' | 'STRATEGY' | 'GOAL' | 'ANOMALY' | 'WEEKLY_SUMMARY' | 'TRADE_NOTE'
   title: string
   body: string
   supportingData?: Record<string, unknown>
@@ -19,14 +22,25 @@ interface AIAnalysisResponse {
 
 export class AIService {
   static async generateInsights(userId: string): Promise<void> {
-    if (!anthropic) return
+    if (!genAI) return
 
     const stats = await this.buildUserContext(userId)
     if (stats.totalTrades < 10) return
 
+    const model = genAI.getGenerativeModel({
+      model: MODEL_NAME,
+      generationConfig: { responseMimeType: 'application/json' },
+    })
+
     const systemPrompt = `
 You are a trading performance analyst reviewing a trader's journal data.
 Identify meaningful patterns, risks, and opportunities in their trading behaviour.
+Analyze:
+- Performance Patterns (best/worst times, days, assets)
+- Risk Management (stop placement, R:R consistency)
+- Psychological Profile (emotional patterns, FOMO)
+- Strategy Effectiveness (win rate per setup)
+
 Respond ONLY with JSON matching the requested schema.`.trim()
 
     const userPrompt = `
@@ -40,7 +54,7 @@ Generate JSON with:
 {
   "insights": [
     {
-      "type": "PATTERN" | "RISK_ALERT" | "EMOTIONAL" | "STRATEGY" | "GOAL" | "ANOMALY",
+      "type": "PATTERN" | "RISK_ALERT" | "EMOTIONAL" | "STRATEGY" | "ANOMALY",
       "title": "Short title",
       "body": "Explanation with specific numbers",
       "supportingData": { }
@@ -48,38 +62,215 @@ Generate JSON with:
   ]
 }`.trim()
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
+    try {
+      const result = await model.generateContent([systemPrompt, userPrompt])
+      const response = result.response
+      const text = response.text()
+      const parsed: AIAnalysisResponse = JSON.parse(text)
+
+      if (!parsed.insights?.length) return
+
+      await supabaseAdmin.from('ai_insights').insert(
+        parsed.insights.map((insight) => ({
+          user_id: userId,
+          insight_type: insight.type,
+          title: insight.title,
+          body: insight.body,
+          supporting_data: insight.supportingData ?? null,
+        }))
+      )
+
+      // Update last analysis trade count
+      await supabaseAdmin
+        .from('user_profiles')
+        .update({ last_ai_analysis_trade_count: stats.totalTrades })
+        .eq('user_id', userId)
+
+    } catch (error) {
+      console.error('Gemini Insight Error:', error)
+    }
+  }
+
+  static async generateTradeNote(userId: string, tradeId: string): Promise<void> {
+    if (!genAI) return
+
+    const { data: trade } = await supabaseAdmin
+      .from('trades')
+      .select('*')
+      .eq('id', tradeId)
+      .eq('user_id', userId)
+      .single()
+
+    if (!trade) return
+
+    const model = genAI.getGenerativeModel({
+      model: MODEL_NAME,
+      generationConfig: { responseMimeType: 'application/json' },
     })
 
-    const content = response.content[0]
-    if (content.type !== 'text') return
+    const systemPrompt = `You are a trading risk coach. Analyze the given trade and provide a brief, actionable note if there are risk violations or exceptional quality.`.trim()
+    const userPrompt = `
+TRADE DATA:
+${JSON.stringify(trade, null, 2)}
 
-    let parsed: AIAnalysisResponse
+Respond ONLY with JSON:
+{
+  "insight": {
+    "type": "RISK_ALERT" | "TRADE_NOTE",
+    "title": "Short title",
+    "body": "Analysis note"
+  }
+}`.trim()
+
     try {
-      const clean = content.text
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
-        .trim()
-      parsed = JSON.parse(clean)
-    } catch {
-      return
+      const result = await model.generateContent([systemPrompt, userPrompt])
+      const parsed = JSON.parse(result.response.text())
+      const insight = parsed.insight
+
+      if (insight) {
+        await supabaseAdmin.from('ai_insights').insert({
+          user_id: userId,
+          trade_id: tradeId,
+          insight_type: insight.type,
+          title: insight.title,
+          body: insight.body,
+        })
+      }
+    } catch (error) {
+      console.error('Gemini Trade Note Error:', error)
     }
+  }
 
-    if (!parsed.insights?.length) return
+  static async generateWeeklySummary(userId: string): Promise<void> {
+    if (!genAI) return
 
-    await supabaseAdmin.from('ai_insights').insert(
-      parsed.insights.map((insight) => ({
+    const stats = await this.buildUserContext(userId)
+    if (stats.totalTrades === 0) return
+
+    const model = genAI.getGenerativeModel({
+      model: MODEL_NAME,
+      generationConfig: { responseMimeType: 'application/json' },
+    })
+
+    const prompt = `Analyze the trader's performance this week and provide a narrative summary.
+STATS: ${JSON.stringify(stats.summary)}
+Respond ONLY with JSON:
+{
+  "title": "Weekly Performance Summary",
+  "body": "Your narrative summary here..."
+}`
+
+    try {
+      const result = await model.generateContent(prompt)
+      const parsed = JSON.parse(result.response.text())
+
+      await supabaseAdmin.from('ai_insights').insert({
         user_id: userId,
-        insight_type: insight.type,
-        title: insight.title,
-        body: insight.body,
-        supporting_data: insight.supportingData ?? null,
-      }))
-    )
+        insight_type: 'WEEKLY_SUMMARY',
+        title: parsed.title,
+        body: parsed.body,
+      })
+
+      await NotificationService.sendPushNotification(
+        userId,
+        parsed.title,
+        "Your weekly trading report is ready."
+      )
+    } catch (error) {
+      console.error('Gemini Weekly Summary Error:', error)
+    }
+  }
+
+  // --- Chat Methods ---
+
+  static async createChatSession(userId: string, title?: string) {
+    const { data, error } = await supabaseAdmin
+      .from('ai_chat_sessions')
+      .insert({ user_id: userId, title: title ?? 'New Conversation' })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  static async listChatSessions(userId: string) {
+    const { data, error } = await supabaseAdmin
+      .from('ai_chat_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  }
+
+  static async getChatHistory(sessionId: string, userId: string) {
+    const { data, error } = await supabaseAdmin
+      .from('ai_chat_messages')
+      .select('*, ai_chat_sessions!inner(user_id)')
+      .eq('session_id', sessionId)
+      .eq('ai_chat_sessions.user_id', userId)
+      .order('created_at', { ascending: true })
+
+    if (error) throw error
+    return data
+  }
+
+  static async sendMessage(userId: string, sessionId: string, message: string) {
+    if (!genAI) throw new Error('AI Service not configured')
+
+    // 0. Verify session ownership
+    const { data: session } = await supabaseAdmin
+      .from('ai_chat_sessions')
+      .select('id')
+      .eq('id', sessionId)
+      .eq('user_id', userId)
+      .single()
+
+    if (!session) throw new Error('Unauthorized or session not found')
+
+    // 1. Save user message
+    await supabaseAdmin.from('ai_chat_messages').insert({
+      session_id: sessionId,
+      role: 'user',
+      content: message,
+    })
+
+    // 2. Get history
+    const history = await this.getChatHistory(sessionId, userId)
+    const context = await this.buildUserContext(userId)
+
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME })
+    const chat = model.startChat({
+      history: history.map((m: any) => ({
+        role: m.role,
+        parts: [{ text: m.content }],
+      })),
+      systemInstruction: `You are an expert trading coach. You have access to the user's trading stats: ${JSON.stringify(context.summary)}. Help them improve their trading.`,
+    })
+
+    const result = await chat.sendMessage(message)
+    const responseText = result.response.text()
+
+    // 3. Save model response
+    const { data: savedMessage } = await supabaseAdmin
+      .from('ai_chat_messages')
+      .insert({
+        session_id: sessionId,
+        role: 'model',
+        content: responseText,
+      })
+      .select()
+      .single()
+
+    // 4. Update session timestamp
+    await supabaseAdmin
+      .from('ai_chat_sessions')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', sessionId)
+
+    return savedMessage
   }
 
   static async listInsights(
@@ -146,4 +337,3 @@ Generate JSON with:
     }
   }
 }
-

@@ -4,6 +4,7 @@ import {
   calculateRRRatio,
 } from '@tradge/utils'
 import type { Trade, TradeFilters, PaginatedResponse } from '@tradge/types'
+import { AIService } from './ai.service'
 
 export interface CreateTradeInput {
   accountId: string
@@ -126,7 +127,37 @@ export class TradeService {
       await supabaseAdmin.from('trade_tags').insert(tagInserts)
     }
 
-    return (await this.getById(userId, trade.id)) as Trade
+    const tradeWithTags = (await this.getById(userId, trade.id)) as Trade
+
+    // AI Triggers
+    this.handleAiTriggers(userId, trade.id).catch(console.error)
+
+    return tradeWithTags
+  }
+
+  private static async handleAiTriggers(userId: string, tradeId: string) {
+    const { data: profile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('ai_analysis_enabled, last_ai_analysis_trade_count')
+      .eq('user_id', userId)
+      .single()
+
+    if (!profile || !profile.ai_analysis_enabled) return
+
+    // 1. Immediate Trade Note (Risk/Quality)
+    await AIService.generateTradeNote(userId, tradeId)
+
+    // 2. Pattern Detection every 5 trades
+    const { count } = await supabaseAdmin
+      .from('trades')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('is_draft', false)
+
+    const totalTrades = count ?? 0
+    if (totalTrades >= 20 && totalTrades >= (profile.last_ai_analysis_trade_count + 5)) {
+      await AIService.generateInsights(userId)
+    }
   }
 
   static async list(

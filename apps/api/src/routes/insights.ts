@@ -19,6 +19,14 @@ const updateBodySchema = z.object({
   isDismissed: z.boolean().optional(),
 })
 
+const chatMessageSchema = z.object({
+  message: z.string().min(1),
+})
+
+const createSessionSchema = z.object({
+  title: z.string().optional(),
+})
+
 router.get('/', validate({ query: listQuerySchema }), async (req, res, next) => {
   try {
     const userId = (req as AuthenticatedRequest).userId
@@ -39,6 +47,59 @@ router.post('/generate', async (req, res, next) => {
     next(err)
   }
 })
+
+// --- Chat Routes ---
+
+router.get('/chat/sessions', async (req, res, next) => {
+  try {
+    const userId = (req as AuthenticatedRequest).userId
+    const sessions = await AIService.listChatSessions(userId)
+    res.json(sessions)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.post(
+  '/chat/sessions',
+  validate({ body: createSessionSchema }),
+  async (req, res, next) => {
+    try {
+      const userId = (req as AuthenticatedRequest).userId
+      const session = await AIService.createChatSession(userId, req.body.title)
+      res.status(201).json(session)
+    } catch (err) {
+      next(err)
+    }
+  }
+)
+
+router.get('/chat/sessions/:sessionId/history', async (req, res, next) => {
+  try {
+    const userId = (req as unknown as AuthenticatedRequest).userId
+    const { sessionId } = req.params
+    const history = await AIService.getChatHistory(sessionId, userId)
+    res.json(history)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.post(
+  '/chat/sessions/:sessionId/messages',
+  validate({ body: chatMessageSchema }),
+  async (req, res, next) => {
+    try {
+      const userId = (req as unknown as AuthenticatedRequest).userId
+      const { sessionId } = req.params
+      const { message } = req.body
+      const response = await AIService.sendMessage(userId, sessionId, message)
+      res.status(201).json(response)
+    } catch (err) {
+      next(err)
+    }
+  }
+)
 
 router.patch(
   '/:id',
