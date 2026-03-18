@@ -14,6 +14,7 @@ import { router } from 'expo-router'
 import { MaterialIcons } from '@expo/vector-icons'
 import { supabase } from '../../src/lib/supabase'
 import { useAuthStore } from '../../src/stores/auth.store'
+import { useLatestInsight } from '../../src/hooks/useInsights'
 
 // ─── Theme ──────────────────────────────────────────────
 const theme = {
@@ -112,6 +113,7 @@ export default function HomeScreen() {
   const colors = isDark ? theme.dark : theme.light
 
   const { user } = useAuthStore()
+  const { data: latestInsight } = useLatestInsight()
 
   const [period, setPeriod] = useState<Period>('1M')
   const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -312,20 +314,43 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            {/* AI Insight (static) */}
-            <View style={styles.section}>
-              <View style={[styles.insightCard, { borderColor: 'rgba(22, 162, 78, 0.3)' }]}>
-                <View style={styles.insightHeader}>
-                  <MaterialIcons name="auto-awesome" size={20} color={theme.primary} />
-                  <Text style={[styles.insightLabel, { color: theme.primary }]}>AI INSIGHT</Text>
+            {/* AI Insight (real data) */}
+            {latestInsight ? (
+              <View style={styles.section}>
+                <View style={[styles.insightCard, { borderColor: 'rgba(22, 162, 78, 0.3)' }]}>
+                  <View style={styles.insightHeader}>
+                    <MaterialIcons name="auto-awesome" size={20} color={theme.primary} />
+                    <Text style={[styles.insightLabel, { color: theme.primary }]}>AI INSIGHT</Text>
+                    {!latestInsight.is_read && (
+                      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: theme.primary, marginLeft: 4 }} />
+                    )}
+                  </View>
+                  <Text style={[styles.insightTitle, { color: colors.text }]}>{latestInsight.title}</Text>
+                  <Text style={[styles.insightText, { color: isDark ? '#e2e8f0' : '#475569' }]}>
+                    {latestInsight.body}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.insightViewAll}
+                    onPress={() => router.push('/(tabs)/insights')}
+                  >
+                    <Text style={styles.insightViewAllText}>View all insights</Text>
+                    <MaterialIcons name="arrow-forward" size={14} color={theme.primary} />
+                  </TouchableOpacity>
                 </View>
-                <Text style={[styles.insightText, { color: isDark ? '#e2e8f0' : '#475569' }]}>
-                  Your win rate is 12% higher on Tuesday mornings. Consider increasing your position size for{' '}
-                  <Text style={{ fontWeight: 'bold', color: theme.primary }}>USD/JPY</Text>
-                  {' '}during London open.
-                </Text>
               </View>
-            </View>
+            ) : (
+              <View style={styles.section}>
+                <View style={[styles.insightCard, { borderColor: 'rgba(22, 162, 78, 0.3)' }]}>
+                  <View style={styles.insightHeader}>
+                    <MaterialIcons name="auto-awesome" size={20} color={theme.primary} />
+                    <Text style={[styles.insightLabel, { color: theme.primary }]}>AI INSIGHT</Text>
+                  </View>
+                  <Text style={[styles.insightText, { color: isDark ? '#e2e8f0' : '#475569' }]}>
+                    Log more trades and your AI coach will generate personalised insights about your performance patterns, risk management, and trading psychology.
+                  </Text>
+                </View>
+              </View>
+            )}
 
             {/* Recent Trades */}
             <View style={styles.section}>
@@ -549,7 +574,10 @@ const styles = StyleSheet.create({
   },
   insightHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   insightLabel: { fontSize: 12, fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
+  insightTitle: { fontSize: 15, fontWeight: 'bold', marginBottom: 2 },
   insightText: { fontSize: 14, lineHeight: 22 },
+  insightViewAll: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  insightViewAllText: { fontSize: 12, fontWeight: 'bold', color: '#16a24e' },
 
   tradesList: { gap: 8 },
   tradeCard: {

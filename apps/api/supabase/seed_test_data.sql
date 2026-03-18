@@ -1,182 +1,120 @@
 -- ============================================================
--- TEST DATA SCRIPT FOR TRADGE DASHBOARD
+-- TEST DATA SCRIPT FOR TRADGE DASHBOARD (AI INSIGHTS EDITION)
 -- ============================================================
 -- Run this in Supabase SQL Editor AFTER running all migrations.
---
--- IMPORTANT: Replace '<YOUR_USER_ID>' below with your actual
--- Supabase auth user ID. You can find it in:
--- Supabase Dashboard → Authentication → Users → click your user → copy the UUID
+-- This script will insert 25 realistic trades to trigger
+-- the AI Insights pattern detection engine.
 -- ============================================================
 
--- Step 0: Set your user ID here
 DO $$
 DECLARE
-  v_user_id UUID;
-  v_account_id UUID;
+  v_user_id     UUID;
+  v_account_id  UUID;
+  v_trade_id    UUID;
+  i             INT;
+  v_instrument  TEXT;
+  v_asset_class asset_class_type;
+  v_direction   direction_type;
+  v_outcome     trade_outcome_type;
+  v_session     session_type;
+  v_emotional   emotional_state_type;
+  v_entry_price NUMERIC;
+  v_exit_price  NUMERIC;
+  v_net_pnl     NUMERIC;
+  v_rr_ratio    NUMERIC;
+  v_offset_days INT;
 BEGIN
-  -- ══════════════════════════════════════════════════
-  -- REPLACE THIS WITH YOUR ACTUAL USER ID
-  -- ══════════════════════════════════════════════════
+  -- 1. Grab the first user
   v_user_id := (SELECT id FROM auth.users LIMIT 1);
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'No user found. Please sign up in the app first.';
+  END IF;
 
-  -- Step 1: Ensure a user_profiles row exists
-  INSERT INTO user_profiles (user_id, display_name, onboarding_done, trading_style, session_focus)
-  VALUES (v_user_id, 'Test Trader', TRUE, ARRAY['Day Trader'], ARRAY['London', 'New York'])
-  ON CONFLICT (user_id) DO UPDATE SET
-    onboarding_done = TRUE,
-    trading_style = ARRAY['Day Trader'],
-    session_focus = ARRAY['London', 'New York'];
+  -- 2. Ensure user context exists
+  INSERT INTO user_profiles (user_id, display_name, onboarding_done, trading_style, session_focus, last_ai_analysis_trade_count)
+  VALUES (v_user_id, 'AI Test Trader', TRUE, ARRAY['Day Trader'], ARRAY['London', 'New York'], 0)
+  ON CONFLICT (user_id) DO UPDATE SET last_ai_analysis_trade_count = 0;
 
-  -- Step 2: Create a trading account
+  -- 3. Ensure an account exists
   INSERT INTO trading_accounts (id, user_id, name, broker, currency, type, initial_balance)
-  VALUES (
-    'a0000000-0000-0000-0000-000000000001',
-    v_user_id,
-    'Funded Live',
-    'Oanda',
-    'USD',
-    'LIVE',
-    10000.00
-  )
+  VALUES ('a0000000-0000-0000-0000-000000000001', v_user_id, 'AI Funded Test', 'Simulation', 'USD', 'LIVE', 10000.00)
   ON CONFLICT (id) DO NOTHING;
-
   v_account_id := 'a0000000-0000-0000-0000-000000000001';
 
-  -- Step 3: Insert sample trades (mix of wins, losses, break-even)
-  -- Trade 1: WIN - BTC/USDT Long +$420.50
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000001', v_user_id, v_account_id,
-    'BTC/USDT', 'CRYPTO', 'LONG',
-    NOW() - INTERVAL '2 hours', NOW() - INTERVAL '1 hour',
-    67500.00, 67920.00, 1.0,
-    67200.00, 68000.00,
-    425.00, 4.50, 420.50,
-    3.2, 'WIN', 'LONDON', 'CONFIDENT',
-    FALSE, FALSE, 60
-  ) ON CONFLICT (id) DO NOTHING;
+  -- 4. Delete existing mock trades so we start fresh
+  DELETE FROM trades WHERE user_id = v_user_id;
+  DELETE FROM ai_insights WHERE user_id = v_user_id;
 
-  -- Trade 2: LOSS - ETH/USDT Short -$150.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000002', v_user_id, v_account_id,
-    'ETH/USDT', 'CRYPTO', 'SHORT',
-    NOW() - INTERVAL '5 hours', NOW() - INTERVAL '4 hours',
-    3800.00, 3830.00, 5.0,
-    3850.00, 3750.00,
-    -147.00, 3.00, -150.00,
-    1.5, 'LOSS', 'NEW_YORK', 'ANXIOUS',
-    FALSE, FALSE, 45
-  ) ON CONFLICT (id) DO NOTHING;
+  -- 5. Generate 25 trades with intentionally injected "Patterns" for Gemini to pick up on:
+  -- Pattern 1: EUR/USD in London is highly profitable (Calm)
+  -- Pattern 2: Crypto (BTC/USDT, SOL/USDT) in Asian session is highly unprofitable (FOMO/Anxious)
+  -- Pattern 3: Poor Risk/Reward ratio on losing trades (cutting winners short, letting losers run)
 
-  -- Trade 3: WIN - XAU/USD Long +$1,120.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000003', v_user_id, v_account_id,
-    'XAU/USD', 'COMMODITIES', 'LONG',
-    NOW() - INTERVAL '1 day', NOW() - INTERVAL '20 hours',
-    2350.00, 2362.00, 100.0,
-    2347.00, 2365.00,
-    1125.00, 5.00, 1120.00,
-    4.0, 'WIN', 'LONDON', 'CALM',
-    FALSE, FALSE, 240
-  ) ON CONFLICT (id) DO NOTHING;
+  FOR i IN 1..25 LOOP
+    v_trade_id := gen_random_uuid();
+    v_offset_days := 25 - i; -- Spread out over last 25 days
+    
+    -- Injecting strict patterns
+    IF i % 3 = 0 THEN
+      -- The Bad Crypto Trades (Asian Session FOMO)
+      v_instrument := 'BTC/USDT';
+      v_asset_class := 'CRYPTO';
+      v_direction := 'LONG';
+      v_outcome := 'LOSS';
+      v_session := 'ASIAN';
+      v_emotional := 'FOMO';
+      v_net_pnl := -250.00 - (random() * 50); -- Big losses
+      v_rr_ratio := 0.5; -- Bad RR
+      v_entry_price := 65000;
+      v_exit_price := 64500;
+    ELSIF i % 2 = 0 THEN
+      -- The Great Forex Trades (London Session Calm)
+      v_instrument := 'EUR/USD';
+      v_asset_class := 'FOREX';
+      v_direction := 'SHORT';
+      v_outcome := 'WIN';
+      v_session := 'LONDON';
+      v_emotional := 'CALM';
+      v_net_pnl := 150.00 + (random() * 100); -- Consistent wins
+      v_rr_ratio := 2.5; -- Good RR
+      v_entry_price := 1.0850;
+      v_exit_price := 1.0810;
+    ELSE
+      -- Mix of BreakEven / Small winners in NY session
+      v_instrument := 'AAPL';
+      v_asset_class := 'STOCKS';
+      v_direction := 'LONG';
+      v_outcome := CASE WHEN random() > 0.5 THEN 'WIN'::trade_outcome_type ELSE 'BREAK_EVEN'::trade_outcome_type END;
+      v_session := 'NEW_YORK';
+      v_emotional := 'CONFIDENT';
+      v_net_pnl := CASE WHEN v_outcome = 'WIN' THEN 80.00 ELSE 10.00 END;
+      v_rr_ratio := 1.2;
+      v_entry_price := 175.00;
+      v_exit_price := CASE WHEN v_outcome = 'WIN' THEN 178.00 ELSE 175.10 END;
+    END IF;
 
-  -- Trade 4: BREAK_EVEN - TSLA Short +$5.20
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000004', v_user_id, v_account_id,
-    'TSLA', 'STOCKS', 'SHORT',
-    NOW() - INTERVAL '1 day 4 hours', NOW() - INTERVAL '1 day 2 hours',
-    255.00, 254.95, 100.0,
-    256.00, 253.00,
-    7.20, 2.00, 5.20,
-    0.1, 'BREAK_EVEN', 'NEW_YORK', 'NEUTRAL',
-    FALSE, FALSE, 120
-  ) ON CONFLICT (id) DO NOTHING;
+    -- Insert the trade
+    INSERT INTO trades (
+      id, user_id, account_id, instrument, asset_class, direction, outcome, session, emotional_state,
+      net_pnl, gross_pnl, fees, rr_ratio, entry_price, exit_price, position_size, stop_loss, take_profit,
+      entry_time, exit_time, trade_duration_minutes, is_open, is_draft
+    ) VALUES (
+      v_trade_id, v_user_id, v_account_id, v_instrument, v_asset_class, v_direction, v_outcome, v_session, v_emotional,
+      ROUND(v_net_pnl, 2), ROUND(v_net_pnl + 5, 2), 5.00, ROUND(v_rr_ratio, 2), v_entry_price, v_exit_price, 1.0, 
+      (v_entry_price * 0.99), (v_entry_price * 1.02),
+      NOW() - (v_offset_days || ' days')::INTERVAL, 
+      NOW() - (v_offset_days || ' days')::INTERVAL + INTERVAL '2 hours',
+      120, FALSE, FALSE
+    );
 
-  -- Trade 5: WIN - NVDA Long +$890.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000005', v_user_id, v_account_id,
-    'NVDA', 'STOCKS', 'LONG',
-    NOW() - INTERVAL '2 days', NOW() - INTERVAL '1 day 18 hours',
-    880.00, 889.50, 100.0,
-    875.00, 892.00,
-    895.00, 5.00, 890.00,
-    2.5, 'WIN', 'NEW_YORK', 'CONFIDENT',
-    FALSE, FALSE, 360
-  ) ON CONFLICT (id) DO NOTHING;
+    -- Add some strategy tags
+    INSERT INTO trade_tags (trade_id, user_id, tag_type, tag_value)
+    VALUES 
+      (v_trade_id, v_user_id, 'STRATEGY', CASE WHEN v_asset_class = 'FOREX' THEN 'Breakout' ELSE 'Mean Reversion' END);
 
-  -- Trade 6: WIN - EUR/USD Long +$320.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000006', v_user_id, v_account_id,
-    'EUR/USD', 'FOREX', 'LONG',
-    NOW() - INTERVAL '3 days', NOW() - INTERVAL '2 days 20 hours',
-    1.0850, 1.0882, 100000.0,
-    1.0830, 1.0900,
-    323.00, 3.00, 320.00,
-    2.8, 'WIN', 'LONDON', 'CALM',
-    FALSE, FALSE, 240
-  ) ON CONFLICT (id) DO NOTHING;
+  END LOOP;
 
-  -- Trade 7: LOSS - GBP/JPY Short -$210.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000007', v_user_id, v_account_id,
-    'GBP/JPY', 'FOREX', 'SHORT',
-    NOW() - INTERVAL '4 days', NOW() - INTERVAL '3 days 20 hours',
-    192.50, 192.80, 50000.0,
-    193.00, 191.50,
-    -207.00, 3.00, -210.00,
-    1.8, 'LOSS', 'ASIAN', 'FEARFUL',
-    FALSE, FALSE, 240
-  ) ON CONFLICT (id) DO NOTHING;
-
-  -- Trade 8: WIN - USD/JPY Long +$550.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000008', v_user_id, v_account_id,
-    'USD/JPY', 'FOREX', 'LONG',
-    NOW() - INTERVAL '5 days', NOW() - INTERVAL '4 days 18 hours',
-    154.20, 154.75, 100000.0,
-    153.90, 155.00,
-    554.00, 4.00, 550.00,
-    3.0, 'WIN', 'LONDON', 'CONFIDENT',
-    FALSE, FALSE, 360
-  ) ON CONFLICT (id) DO NOTHING;
-
-  -- Trade 9: LOSS - SOL/USDT Long -$180.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000009', v_user_id, v_account_id,
-    'SOL/USDT', 'CRYPTO', 'LONG',
-    NOW() - INTERVAL '6 days', NOW() - INTERVAL '5 days 20 hours',
-    175.00, 173.20, 10.0,
-    172.00, 180.00,
-    -176.00, 4.00, -180.00,
-    1.7, 'LOSS', 'NEW_YORK', 'FOMO',
-    FALSE, FALSE, 240
-  ) ON CONFLICT (id) DO NOTHING;
-
-  -- Trade 10: WIN - AAPL Long +$430.00
-  INSERT INTO trades (id, user_id, account_id, instrument, asset_class, direction, entry_time, exit_time, entry_price, exit_price, position_size, stop_loss, take_profit, gross_pnl, fees, net_pnl, rr_ratio, outcome, session, emotional_state, is_open, is_draft, trade_duration_minutes)
-  VALUES (
-    'b0000000-0000-0000-0000-000000000010', v_user_id, v_account_id,
-    'AAPL', 'STOCKS', 'LONG',
-    NOW() - INTERVAL '7 days', NOW() - INTERVAL '6 days 18 hours',
-    228.00, 232.40, 100.0,
-    226.00, 234.00,
-    435.00, 5.00, 430.00,
-    2.2, 'WIN', 'NEW_YORK', 'CALM',
-    FALSE, FALSE, 360
-  ) ON CONFLICT (id) DO NOTHING;
-
-  RAISE NOTICE '✅ Test data inserted successfully for user %', v_user_id;
-  RAISE NOTICE '📊 10 trades: 6 WINS, 3 LOSSES, 1 BREAK_EVEN';
-  RAISE NOTICE '💰 Total Net P&L: +$3,195.70';
-  RAISE NOTICE '📈 Win Rate: 66.7%%';
-  RAISE NOTICE '🎯 Avg R:R: ~2.28';
+  RAISE NOTICE '✅ 25 highly structured AI testing trades successfully inserted!';
+  RAISE NOTICE '➡️ To test AI insights, log 1 more new trade in the mobile app to trigger the >= 20 trades threshold hook, or manually hit the POST /insights/generate endpoint.';
 
 END $$;

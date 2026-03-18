@@ -15,6 +15,15 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { MaterialIcons } from '@expo/vector-icons'
 import { supabase } from '../../src/lib/supabase'
 import { useAuthStore } from '../../src/stores/auth.store'
+import {
+  useInsights,
+  useUnreadInsightCount,
+  useMarkInsightRead,
+  useDismissInsight,
+  type AIInsight,
+} from '../../src/hooks/useInsights'
+import { useQueryClient } from '@tanstack/react-query'
+import { insightKeys } from '../../src/hooks/useInsights'
 
 const { width: SCREEN_W } = Dimensions.get('window')
 
@@ -60,50 +69,84 @@ interface InstrumentStat {
   wins: number
 }
 
-// ── Static AI Insights ────────────────────────────────────────────────────────
+// ── Insight Type → UI Mapping ─────────────────────────────────────────────────
 
-const AI_INSIGHTS = [
-  {
-    id: '1',
-    category: 'Risk',
-    categoryColor: '#f97316',
-    categoryBg: 'rgba(249, 115, 22, 0.1)',
-    categoryBorder: 'rgba(249, 115, 22, 0.2)',
-    title: 'Over-leveraging at Open',
-    body:
-      'Data shows your position sizes tend to be 24% larger during early session opens, leading to higher drawdowns compared to mid-session entries. Consider sizing down at market open.',
-  },
-  {
-    id: '2',
-    category: 'Performance',
-    categoryColor: '#16a24e',
-    categoryBg: 'rgba(22, 162, 78, 0.1)',
-    categoryBorder: 'rgba(22, 162, 78, 0.2)',
-    title: 'Best Setup: Breakout',
-    body:
-      'Your breakout trades have consistently delivered the highest profit factor in your portfolio. Prioritising this setup and reducing mean-reversion trades could improve overall returns.',
-  },
-  {
-    id: '3',
-    category: 'Psychology',
-    categoryColor: '#3b82f6',
-    categoryBg: 'rgba(59, 130, 246, 0.1)',
-    categoryBorder: 'rgba(59, 130, 246, 0.2)',
-    title: 'Stop-Loss Discipline',
-    body:
-      'Your last recorded trades show strong adherence to your stop-loss zones. Maintaining this discipline is the single most impactful habit for protecting your capital in volatile markets.',
-  },
-  {
-    id: '4',
-    category: 'Timing',
-    categoryColor: '#a855f7',
-    categoryBg: 'rgba(168, 85, 247, 0.1)',
-    categoryBorder: 'rgba(168, 85, 247, 0.2)',
-    title: 'NY Session Dominance',
-    body:
-      'Your highest win-rates consistently appear during New York session hours. Concentrating trading efforts on NY session and reducing Asian session activity may improve overall statistics.',
-  },
-]
+function getInsightMeta(type: string) {
+  switch (type) {
+    case 'RISK_ALERT':
+      return {
+        category: 'Risk',
+        categoryColor: '#f97316',
+        categoryBg: 'rgba(249, 115, 22, 0.1)',
+        categoryBorder: 'rgba(249, 115, 22, 0.2)',
+        icon: 'warning' as const,
+      }
+    case 'PATTERN':
+      return {
+        category: 'Pattern',
+        categoryColor: '#16a24e',
+        categoryBg: 'rgba(22, 162, 78, 0.1)',
+        categoryBorder: 'rgba(22, 162, 78, 0.2)',
+        icon: 'insights' as const,
+      }
+    case 'EMOTIONAL':
+      return {
+        category: 'Psychology',
+        categoryColor: '#3b82f6',
+        categoryBg: 'rgba(59, 130, 246, 0.1)',
+        categoryBorder: 'rgba(59, 130, 246, 0.2)',
+        icon: 'psychology' as const,
+      }
+    case 'STRATEGY':
+      return {
+        category: 'Strategy',
+        categoryColor: '#a855f7',
+        categoryBg: 'rgba(168, 85, 247, 0.1)',
+        categoryBorder: 'rgba(168, 85, 247, 0.2)',
+        icon: 'auto-awesome' as const,
+      }
+    case 'WEEKLY_SUMMARY':
+      return {
+        category: 'Weekly',
+        categoryColor: '#06b6d4',
+        categoryBg: 'rgba(6, 182, 212, 0.1)',
+        categoryBorder: 'rgba(6, 182, 212, 0.2)',
+        icon: 'date-range' as const,
+      }
+    case 'TRADE_NOTE':
+      return {
+        category: 'Trade Note',
+        categoryColor: '#eab308',
+        categoryBg: 'rgba(234, 179, 8, 0.1)',
+        categoryBorder: 'rgba(234, 179, 8, 0.2)',
+        icon: 'sticky-note-2' as const,
+      }
+    case 'ANOMALY':
+      return {
+        category: 'Anomaly',
+        categoryColor: '#ef4444',
+        categoryBg: 'rgba(239, 68, 68, 0.1)',
+        categoryBorder: 'rgba(239, 68, 68, 0.2)',
+        icon: 'error-outline' as const,
+      }
+    case 'GOAL':
+      return {
+        category: 'Goal',
+        categoryColor: '#16a24e',
+        categoryBg: 'rgba(22, 162, 78, 0.1)',
+        categoryBorder: 'rgba(22, 162, 78, 0.2)',
+        icon: 'flag' as const,
+      }
+    default:
+      return {
+        category: type,
+        categoryColor: '#94a3b8',
+        categoryBg: 'rgba(148, 163, 184, 0.1)',
+        categoryBorder: 'rgba(148, 163, 184, 0.2)',
+        icon: 'auto-awesome' as const,
+      }
+  }
+}
 
 const TIME_RANGES = ['1W', '1M', '3M', 'YTD', 'ALL'] as const
 type TimeRange = typeof TIME_RANGES[number]
@@ -140,11 +183,24 @@ function fmtPct(val: number) {
   return `${val.toFixed(1)}%`
 }
 
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.floor(hrs / 24)
+  if (days < 7) return `${days}d ago`
+  const weeks = Math.floor(days / 7)
+  return `${weeks}w ago`
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function InsightsScreen() {
   const isDark = useColorScheme() === 'dark'
   const { user } = useAuthStore()
+  const queryClient = useQueryClient()
 
   const [tab, setTab] = useState<'ai' | 'perf'>('ai')
   const [timeRange, setTimeRange] = useState<TimeRange>('1M')
@@ -155,6 +211,14 @@ export default function InsightsScreen() {
   const [strategyData, setStrategyData] = useState<StrategyPnl[]>([])
   const [sessionData, setSessionData] = useState<SessionPnl[]>([])
   const [instrumentData, setInstrumentData] = useState<InstrumentStat[]>([])
+
+  // ── Real AI Insights from Supabase ──
+  const { data: insightsResult, isLoading: insightsLoading, refetch: refetchInsights } = useInsights(1, 20)
+  const { data: unreadCount = 0 } = useUnreadInsightCount()
+  const markRead = useMarkInsightRead()
+  const dismiss = useDismissInsight()
+
+  const insights = insightsResult?.data ?? []
 
   const c = isDark
     ? {
@@ -188,7 +252,7 @@ export default function InsightsScreen() {
       .from('trades')
       .select('*')
       .eq('user_id', user.id)
-      .eq('is_open', false) // only closed trades for analytics
+      .eq('is_open', false)
 
     if (from) query = query.gte('entry_time', from)
 
@@ -200,7 +264,7 @@ export default function InsightsScreen() {
       return
     }
 
-    // ── Stats ──────────────────────────────────────────────────────────────
+    // ── Stats ──
     const wins = trades.filter(t => t.outcome === 'WIN')
     const losses = trades.filter(t => t.outcome === 'LOSS')
     const bes = trades.filter(t => t.outcome === 'BREAK_EVEN')
@@ -212,22 +276,18 @@ export default function InsightsScreen() {
     const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((s, t) => s + (parseFloat(t.net_pnl) || 0), 0) / losses.length) : 0
     const winRate = total > 0 ? (wins.length / total) * 100 : 0
 
-    // Profit Factor = Gross Profit / Gross Loss
     const grossProfit = wins.reduce((s, t) => s + (parseFloat(t.net_pnl) || 0), 0)
     const grossLoss = Math.abs(losses.reduce((s, t) => s + (parseFloat(t.net_pnl) || 0), 0))
     const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? 9.99 : 0
 
-    // Expectancy = (WinRate × AvgWin) − (LossRate × AvgLoss)
     const lossRate = total > 0 ? losses.length / total : 0
     const expectancy = (winRate / 100) * avgWin - lossRate * avgLoss
 
-    // Simplified Sharpe (daily PnL stdev)
     const pnlArr = trades.map(t => parseFloat(t.net_pnl) || 0)
     const mean = pnlArr.length > 0 ? pnlArr.reduce((a, b) => a + b, 0) / pnlArr.length : 0
     const variance = pnlArr.length > 1 ? pnlArr.reduce((s, v) => s + (v - mean) ** 2, 0) / (pnlArr.length - 1) : 1
     const sharpeRatio = variance > 0 ? mean / Math.sqrt(variance) : 0
 
-    // Max Drawdown (% peak to trough on cumulative PnL)
     let peak = 0, cum = 0, maxDD = 0
     for (const t of trades.sort((a, b) => new Date(a.entry_time).getTime() - new Date(b.entry_time).getTime())) {
       cum += parseFloat(t.net_pnl) || 0
@@ -255,7 +315,7 @@ export default function InsightsScreen() {
       openTrades: 0,
     })
 
-    // ── By Strategy ────────────────────────────────────────────────────────
+    // ── By Strategy ──
     const { data: tagData } = await supabase
       .from('trade_tags')
       .select('trade_id, tag_value')
@@ -276,7 +336,7 @@ export default function InsightsScreen() {
       .sort((a, b) => b.pnl - a.pnl)
     setStrategyData(stratArr)
 
-    // ── By Session ─────────────────────────────────────────────────────────
+    // ── By Session ──
     const sessionMap: Record<string, { pnl: number; trades: number }> = {}
     for (const t of trades) {
       const s = t.session || 'UNTAGGED'
@@ -289,7 +349,7 @@ export default function InsightsScreen() {
       .sort((a, b) => b.pnl - a.pnl)
     setSessionData(sessArr)
 
-    // ── By Instrument ──────────────────────────────────────────────────────
+    // ── By Instrument ──
     const instrMap: Record<string, { assetClass: string; pnl: number; trades: number; wins: number }> = {}
     for (const t of trades) {
       const key = t.instrument
@@ -315,9 +375,18 @@ export default function InsightsScreen() {
   const onRefresh = () => {
     setRefreshing(true)
     fetchData()
+    refetchInsights()
   }
 
-  // ── Bar chart helpers ──────────────────────────────────────────────────────
+  const handleDismiss = (id: string) => {
+    dismiss.mutate(id)
+  }
+
+  const handleMarkRead = (id: string) => {
+    markRead.mutate(id)
+  }
+
+  // ── Bar chart helpers ──
   const maxAbsSession = Math.max(...sessionData.map(s => Math.abs(s.pnl)), 1)
   const maxAbsStrategy = Math.max(...strategyData.map(s => Math.abs(s.pnl)), 1)
 
@@ -337,6 +406,11 @@ export default function InsightsScreen() {
           >
             <MaterialIcons name="auto-awesome" size={14} color={tab === 'ai' ? '#fff' : c.sub} />
             <Text style={[styles.tabSwitchText, { color: tab === 'ai' ? '#fff' : c.sub }]}>AI</Text>
+            {unreadCount > 0 && tab !== 'ai' && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tabSwitchBtn, tab === 'perf' && { backgroundColor: '#16a24e' }]}
@@ -371,85 +445,115 @@ export default function InsightsScreen() {
 
       {/* ── Content ── */}
       {tab === 'ai' ? (
-        // ── AI INSIGHTS TAB ──────────────────────────────────────────────────
-        <ScrollView
-          contentContainerStyle={styles.scrollPad}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Weekly Hero Card */}
-          <View style={styles.heroCard}>
-            <View style={styles.heroCardBgIcon}>
-              <MaterialIcons name="trending-up" size={80} color="rgba(22,162,78,0.15)" />
-            </View>
-            <Text style={styles.heroCardLabel}>Weekly Performance</Text>
-            <Text style={styles.heroCardTitle}>Your AI Coach Summary</Text>
-            <View style={styles.heroCardGrid}>
-              <View style={styles.heroCardStat}>
-                <Text style={styles.heroCardStatLabel}>Status</Text>
-                <Text style={[styles.heroCardStatVal, { color: '#16a24e' }]}>Active</Text>
-              </View>
-              <View style={styles.heroCardStat}>
-                <Text style={styles.heroCardStatLabel}>Insights</Text>
-                <Text style={styles.heroCardStatVal}>{AI_INSIGHTS.length}</Text>
-              </View>
-              <View style={[styles.heroCardStat, { borderBottomWidth: 0 }]}>
-                <Text style={styles.heroCardStatLabel}>Type</Text>
-                <Text style={styles.heroCardStatVal}>Static AI</Text>
-              </View>
-            </View>
+        // ── AI INSIGHTS TAB ──
+        insightsLoading ? (
+          <View style={styles.loaderBox}>
+            <ActivityIndicator size="large" color="#16a24e" />
           </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.scrollPad}
+            showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16a24e" />}
+          >
+            {/* Hero Card */}
+            <View style={styles.heroCard}>
+              <View style={styles.heroCardBgIcon}>
+                <MaterialIcons name="auto-awesome" size={80} color="rgba(22,162,78,0.15)" />
+              </View>
+              <Text style={styles.heroCardLabel}>AI Coach</Text>
+              <Text style={styles.heroCardTitle}>Your Trading Insights</Text>
+              <View style={styles.heroCardGrid}>
+                <View style={styles.heroCardStat}>
+                  <Text style={styles.heroCardStatLabel}>Total</Text>
+                  <Text style={styles.heroCardStatVal}>{insightsResult?.total ?? 0}</Text>
+                </View>
+                <View style={styles.heroCardStat}>
+                  <Text style={styles.heroCardStatLabel}>Unread</Text>
+                  <Text style={[styles.heroCardStatVal, unreadCount > 0 && { color: '#16a24e' }]}>
+                    {unreadCount}
+                  </Text>
+                </View>
+                <View style={[styles.heroCardStat, { borderBottomWidth: 0 }]}>
+                  <Text style={styles.heroCardStatLabel}>Source</Text>
+                  <Text style={styles.heroCardStatVal}>Gemini</Text>
+                </View>
+              </View>
+            </View>
 
-          {/* Insight Feed */}
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: c.sub }]}>Insight Feed</Text>
-            <MaterialIcons name="filter-list" size={18} color={c.sub} />
-          </View>
+            {/* Insight Feed */}
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: c.sub }]}>Insight Feed</Text>
+              {unreadCount > 0 && (
+                <View style={styles.unreadPill}>
+                  <Text style={styles.unreadPillText}>{unreadCount} new</Text>
+                </View>
+              )}
+            </View>
 
-          {AI_INSIGHTS.map(insight => (
-            <View key={insight.id} style={[styles.insightCard, { backgroundColor: c.card, borderColor: c.border }]}>
-              <View style={[
-                styles.insightCategoryBadge,
-                { backgroundColor: insight.categoryBg, borderColor: insight.categoryBorder }
-              ]}>
-                <Text style={[styles.insightCategoryText, { color: insight.categoryColor }]}>
-                  {insight.category}
+            {insights.length === 0 ? (
+              <View style={[styles.emptyAiBox, { borderColor: c.border }]}>
+                <MaterialIcons name="auto-awesome" size={48} color="rgba(22,162,78,0.3)" />
+                <Text style={[styles.emptyAiTitle, { color: c.text }]}>No AI Insights Yet</Text>
+                <Text style={[styles.emptyAiSub, { color: c.sub }]}>
+                  Keep logging trades and your AI coach will analyze your performance patterns, risk management, and psychology.
+                </Text>
+                <Text style={[styles.emptyAiNote, { color: c.sub }]}>
+                  Insights are generated automatically after 10+ trades.
                 </Text>
               </View>
-              <Text style={[styles.insightTitle, { color: c.text }]}>{insight.title}</Text>
-              <Text style={[styles.insightBody, { color: c.sub }]}>"{insight.body}"</Text>
-              <TouchableOpacity style={styles.insightLink}>
-                <Text style={styles.insightLinkText}>View related trades</Text>
-                <MaterialIcons name="arrow-forward" size={14} color="#16a24e" />
-              </TouchableOpacity>
-            </View>
-          ))}
+            ) : (
+              insights.map(insight => {
+                const meta = getInsightMeta(insight.insight_type)
+                return (
+                  <View key={insight.id} style={[styles.insightCard, { backgroundColor: c.card, borderColor: c.border }]}>
+                    <View style={styles.insightTopRow}>
+                      <View style={[
+                        styles.insightCategoryBadge,
+                        { backgroundColor: meta.categoryBg, borderColor: meta.categoryBorder }
+                      ]}>
+                        <Text style={[styles.insightCategoryText, { color: meta.categoryColor }]}>
+                          {meta.category}
+                        </Text>
+                      </View>
+                      <View style={styles.insightActions}>
+                        {!insight.is_read && (
+                          <View style={styles.unreadDot} />
+                        )}
+                        <Text style={[styles.insightTime, { color: c.sub }]}>
+                          {timeAgo(insight.generated_at)}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => handleDismiss(insight.id)}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        >
+                          <MaterialIcons name="close" size={16} color={c.sub} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <Text style={[styles.insightTitle, { color: c.text }]}>{insight.title}</Text>
+                    <Text style={[styles.insightBody, { color: c.sub }]}>"{insight.body}"</Text>
+                    {!insight.is_read && (
+                      <TouchableOpacity
+                        style={styles.insightLink}
+                        onPress={() => handleMarkRead(insight.id)}
+                      >
+                        <Text style={styles.insightLinkText}>Mark as read</Text>
+                        <MaterialIcons name="check" size={14} color="#16a24e" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )
+              })
+            )}
 
-          {/* Ask AI Box */}
-          <View style={[styles.askAiBox, { borderColor: c.border }]}>
-            <View style={styles.askAiHeader}>
-              <MaterialIcons name="chat-bubble-outline" size={20} color="#16a24e" />
-              <Text style={[styles.askAiTitle, { color: c.text }]}>ASK YOUR DATA</Text>
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.askAiChips}>
-              {['When do I trade best?', "What's my best setup?", 'Compare to last month'].map(q => (
-                <View key={q} style={[styles.askAiChip, { borderColor: c.border }]}>
-                  <Text style={[styles.askAiChipText, { color: c.sub }]}>{q}</Text>
-                </View>
-              ))}
-            </ScrollView>
-            <View style={[styles.askAiInputRow, { borderColor: c.border, backgroundColor: isDark ? '#0a0f0c' : '#f6f8f7' }]}>
-              <Text style={[styles.askAiPlaceholder, { color: c.sub }]}>Type a question…</Text>
-              <View style={styles.askAiSendBtn}>
-                <MaterialIcons name="send" size={16} color="#fff" />
-              </View>
-            </View>
-            <Text style={[styles.askAiNote, { color: c.sub }]}>AI chat — coming soon</Text>
-          </View>
 
-          <View style={{ height: 40 }} />
-        </ScrollView>
+
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        )
       ) : (
-        // ── PERFORMANCE ANALYTICS TAB ────────────────────────────────────────
+        // ── PERFORMANCE ANALYTICS TAB ──
         loading ? (
           <View style={styles.loaderBox}>
             <ActivityIndicator size="large" color="#16a24e" />
@@ -634,6 +738,18 @@ const styles = StyleSheet.create({
   },
   tabSwitchText: { fontSize: 12, fontWeight: 'bold' },
 
+  unreadBadge: {
+    backgroundColor: '#ef4444',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    marginLeft: 2,
+  },
+  unreadBadgeText: { color: '#fff', fontSize: 9, fontWeight: 'bold' },
+
   timeRangeBar: {
     flexDirection: 'row',
     paddingHorizontal: 16,
@@ -706,12 +822,54 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
   },
 
+  unreadPill: {
+    backgroundColor: 'rgba(22,162,78,0.15)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  unreadPillText: {
+    color: '#16a24e',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+
+  // ── Empty AI state ──
+  emptyAiBox: {
+    borderWidth: 1,
+    borderRadius: 16,
+    borderStyle: 'dashed',
+    padding: 32,
+    alignItems: 'center',
+    gap: 12,
+  },
+  emptyAiTitle: { fontSize: 18, fontWeight: 'bold' },
+  emptyAiSub: { fontSize: 13, textAlign: 'center', lineHeight: 20 },
+  emptyAiNote: { fontSize: 11, fontStyle: 'italic', textAlign: 'center', marginTop: 4 },
+
   insightCard: {
     borderWidth: 1,
     borderRadius: 12,
     padding: 20,
     marginBottom: 12,
     gap: 10,
+  },
+  insightTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  insightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  insightTime: { fontSize: 10 },
+  unreadDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#16a24e',
   },
   insightCategoryBadge: {
     alignSelf: 'flex-start',

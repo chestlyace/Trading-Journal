@@ -7,7 +7,7 @@ const genAI = env.GOOGLE_GEMINI_API_KEY
   ? new GoogleGenerativeAI(env.GOOGLE_GEMINI_API_KEY)
   : null
 
-const MODEL_NAME = 'gemini-1.5-flash-latest' // Using 1.5 flash as requested (or lite if available in SDK)
+const MODEL_NAME = 'gemini-2.0-flash'
 
 interface InsightCard {
   type: 'PATTERN' | 'RISK_ALERT' | 'EMOTIONAL' | 'STRATEGY' | 'GOAL' | 'ANOMALY' | 'WEEKLY_SUMMARY' | 'TRADE_NOTE'

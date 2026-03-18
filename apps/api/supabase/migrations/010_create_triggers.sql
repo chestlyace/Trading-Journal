@@ -23,11 +23,14 @@ CREATE TRIGGER set_accounts_updated_at
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO user_profiles (user_id, display_name)
+  INSERT INTO public.user_profiles (user_id, display_name)
   VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name');
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- Ensure the function runs as postgres so SECURITY DEFINER fully bypasses RLS
+ALTER FUNCTION handle_new_user() OWNER TO postgres;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
