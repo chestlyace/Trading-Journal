@@ -29,6 +29,11 @@ export interface TradeFormState {
 
     // Step 6: Review / Notes
     notes: string
+    voiceNotes: Array<{
+        uri: string
+        duration: number
+        mimeType: string
+    }>
 
     // Methods
     updateField: <K extends keyof Omit<TradeFormState, 'updateField' | 'reset'>>(field: K, value: TradeFormState[K]) => void
@@ -53,6 +58,7 @@ const initialState = {
     emotionalState: '',
     rating: 0,
     notes: '',
+    voiceNotes: [],
 }
 
 export const useTradeFormStore = create<TradeFormState>((set) => ({

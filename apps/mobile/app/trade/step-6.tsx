@@ -20,6 +20,8 @@ import { supabase } from '../../src/lib/supabase'
 import { useAuthStore } from '../../src/stores/auth.store'
 import * as ImagePicker from 'expo-image-picker'
 import { decode } from 'base64-arraybuffer'
+import { Audio } from 'expo-av'
+import * as FileSystem from 'expo-file-system'
 
 export default function NewTradeStep6() {
     const isDark = useColorScheme() === 'dark'
@@ -28,6 +30,9 @@ export default function NewTradeStep6() {
 
     const [saving, setSaving] = useState(false)
     const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([])
+
+    const [recording, setRecording] = useState<Audio.Recording | null>(null)
+    const [isRecording, setIsRecording] = useState(false)
 
     // Calcs for preview
     const entry = parseFloat(store.entryPrice) || 0
@@ -59,6 +64,50 @@ export default function NewTradeStep6() {
 
     const removeImage = (index: number) => {
         setImages(images.filter((_, i) => i !== index))
+    }
+
+    async function startRecording() {
+        try {
+            const permission = await Audio.requestPermissionsAsync()
+            if (permission.status !== 'granted') return
+
+            await Audio.setAudioModeAsync({
+                allowsRecordingIOS: true,
+                playsInSilentModeIOS: true,
+            })
+
+            const { recording } = await Audio.Recording.createAsync(
+                Audio.RecordingOptionsPresets.HIGH_QUALITY
+            )
+            setRecording(recording)
+            setIsRecording(true)
+        } catch (err) {
+            console.error('Failed to start recording', err)
+        }
+    }
+
+    async function stopRecording() {
+        if (!recording) return
+        setIsRecording(false)
+        await recording.stopAndUnloadAsync()
+        const uri = recording.getURI()
+        const status = await recording.getStatusAsync()
+
+        if (uri) {
+            store.updateField('voiceNotes', [
+                ...store.voiceNotes,
+                {
+                    uri,
+                    duration: status.durationMillis,
+                    mimeType: 'audio/m4a', // Default for high quality on most platforms
+                },
+            ])
+        }
+        setRecording(null)
+    }
+
+    const removeVoiceNote = (index: number) => {
+        store.updateField('voiceNotes', store.voiceNotes.filter((_, i) => i !== index))
     }
 
     const onSave = async () => {
@@ -145,6 +194,46 @@ export default function NewTradeStep6() {
                 }
             }
 
+            // Upload Voice Notes
+            if (store.voiceNotes.length > 0 && tradeData) {
+                for (const vn of store.voiceNotes) {
+                    const fileExt = vn.uri.split('.').pop() || 'm4a'
+                    const fileName = `${tradeData.id}/${Date.now()}.${fileExt}`
+
+                    const base64 = await FileSystem.readAsStringAsync(vn.uri, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    })
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('trade_voice_notes')
+                        .upload(fileName, decode(base64), {
+                            contentType: vn.mimeType || `audio/${fileExt}`
+                        })
+
+                    if (!uploadError) {
+                        const { data: vnData, error: vnInsErr } = await supabase.from('trade_voice_notes').insert({
+                            trade_id: tradeData.id,
+                            user_id: user.id,
+                            storage_key: fileName,
+                            file_name: `Voice Note ${new Date().toLocaleTimeString()}`,
+                            file_size: null, // Could get this from file system if needed
+                            mime_type: vn.mimeType || `audio/${fileExt}`,
+                            duration_seconds: Math.round(vn.duration / 1000)
+                        }).select().single()
+
+                        if (vnData && !vnInsErr) {
+                            // Trigger transcription in background
+                            fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/v1/trades/${tradeData.id}/voice-notes/${vnData.id}/transcribe`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+                                }
+                            }).catch(e => console.error('Transcription trigger failed', e))
+                        }
+                    }
+                }
+            }
+
             store.reset()
             router.replace('/(tabs)/trades')
         } catch (err: any) {
@@ -207,6 +296,35 @@ export default function NewTradeStep6() {
                             <TouchableOpacity style={styles.uploadBoxSmall} onPress={pickImage}>
                                 <MaterialIcons name="add-photo-alternate" size={28} color="#16a24e" style={{ marginBottom: 4 }} />
                                 <Text style={styles.uploadTextSmall}>Add</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    </View>
+
+                    <View style={styles.field}>
+                        <Text style={styles.label}>Voice Rationale</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                            {store.voiceNotes.map((vn, index) => (
+                                <View key={index} style={styles.voiceNotePreview}>
+                                    <MaterialIcons name="mic" size={24} color="#16a24e" />
+                                    <Text style={styles.voiceNoteDuration}>{Math.round(vn.duration / 1000)}s</Text>
+                                    <TouchableOpacity style={styles.imgRemoveBtn} onPress={() => removeVoiceNote(index)}>
+                                        <MaterialIcons name="close" size={16} color="#fff" />
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                            <TouchableOpacity
+                                style={[styles.uploadBoxSmall, isRecording && { borderColor: '#ef4444' }]}
+                                onPress={isRecording ? stopRecording : startRecording}
+                            >
+                                <MaterialIcons
+                                    name={isRecording ? "stop" : "mic"}
+                                    size={28}
+                                    color={isRecording ? "#ef4444" : "#16a24e"}
+                                    style={{ marginBottom: 4 }}
+                                />
+                                <Text style={[styles.uploadTextSmall, isRecording && { color: '#ef4444' }]}>
+                                    {isRecording ? "Stop" : "Record"}
+                                </Text>
                             </TouchableOpacity>
                         </ScrollView>
                     </View>
@@ -309,6 +427,23 @@ const styles = StyleSheet.create({
     imgPreviewBox: { position: 'relative', width: 100, height: 100, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(22, 162, 78, 0.2)' },
     imgPreview: { width: '100%', height: '100%' },
     imgRemoveBtn: { position: 'absolute', top: 4, right: 4, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 12, padding: 4 },
+
+    voiceNotePreview: {
+        width: 100,
+        height: 100,
+        borderRadius: 8,
+        backgroundColor: 'rgba(22, 162, 78, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(22, 162, 78, 0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 4,
+    },
+    voiceNoteDuration: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#16a24e',
+    },
 
     gridPreview: { flexDirection: 'row', gap: 16 },
     previewCard: { flex: 1, padding: 16, borderRadius: 12, backgroundColor: 'rgba(22, 162, 78, 0.05)', borderWidth: 1, gap: 8 },
