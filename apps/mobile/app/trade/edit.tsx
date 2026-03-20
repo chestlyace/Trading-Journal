@@ -22,6 +22,8 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import { decode } from 'base64-arraybuffer'
 import { useQueryClient } from '@tanstack/react-query'
 import { tradeKeys } from '../../src/hooks/useTrades'
+import { Audio } from 'expo-av'
+import * as FileSystem from 'expo-file-system'
 
 const ASSET_CLASSES = ['CRYPTO', 'FOREX', 'STOCKS', 'COMMODITIES'] as const
 const SESSIONS = ['LONDON', 'NEW_YORK', 'TOKYO', 'SYDNEY', 'OVERLAP'] as const
@@ -72,6 +74,13 @@ export default function EditTradeScreen() {
     const [existingImages, setExistingImages] = useState<any[]>([])
     const [newImages, setNewImages] = useState<ImagePicker.ImagePickerAsset[]>([])
     const [removedImageIds, setRemovedImageIds] = useState<string[]>([])
+
+    // Voice Notes
+    const [existingVoiceNotes, setExistingVoiceNotes] = useState<any[]>([])
+    const [newVoiceNotes, setNewVoiceNotes] = useState<any[]>([])
+    const [removedVoiceNoteIds, setRemovedVoiceNoteIds] = useState<string[]>([])
+    const [recording, setRecording] = useState<Audio.Recording | null>(null)
+    const [isRecording, setIsRecording] = useState(false)
 
     // Date pickers
     const [showEntryPicker, setShowEntryPicker] = useState(false)
@@ -138,6 +147,16 @@ export default function EditTradeScreen() {
                 setExistingImages(withUrls)
             }
 
+            // Load voice notes
+            const { data: vnData } = await supabase
+                .from('trade_voice_notes')
+                .select('*')
+                .eq('trade_id', id)
+
+            if (vnData && vnData.length > 0) {
+                setExistingVoiceNotes(vnData)
+            }
+
             setLoading(false)
         }
 
@@ -186,6 +205,40 @@ export default function EditTradeScreen() {
 
     const removeNewImage = (index: number) => {
         setNewImages(prev => prev.filter((_, i) => i !== index))
+    }
+
+    async function startRecording() {
+        try {
+            const permission = await Audio.requestPermissionsAsync()
+            if (permission.status !== 'granted') return
+            await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true })
+            const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY)
+            setRecording(recording)
+            setIsRecording(true)
+        } catch (err) {
+            console.error('Failed to start recording', err)
+        }
+    }
+
+    async function stopRecording() {
+        if (!recording) return
+        setIsRecording(false)
+        await recording.stopAndUnloadAsync()
+        const uri = recording.getURI()
+        const status = await recording.getStatusAsync()
+        if (uri) {
+            setNewVoiceNotes(prev => [...prev, { uri, duration: status.durationMillis, mimeType: 'audio/m4a' }])
+        }
+        setRecording(null)
+    }
+
+    const removeExistingVoiceNote = (vnId: string) => {
+        setRemovedVoiceNoteIds(prev => [...prev, vnId])
+        setExistingVoiceNotes(prev => prev.filter(v => v.id !== vnId))
+    }
+
+    const removeNewVoiceNote = (index: number) => {
+        setNewVoiceNotes(prev => prev.filter((_, i) => i !== index))
     }
 
     const addTag = () => {
@@ -308,6 +361,46 @@ export default function EditTradeScreen() {
                         file_size: img.fileSize,
                         mime_type: `image/${fileExt}`,
                     })
+                }
+            }
+
+            // Delete removed voice notes
+            for (const vnId of removedVoiceNoteIds) {
+                const vn = (await supabase.from('trade_voice_notes').select('*').eq('id', vnId).single()).data
+                if (vn?.storage_key) {
+                    await supabase.storage.from('trade_voice_notes').remove([vn.storage_key])
+                }
+                await supabase.from('trade_voice_notes').delete().eq('id', vnId)
+            }
+
+            // Upload new voice notes
+            for (const vn of newVoiceNotes) {
+                const fileExt = vn.uri.split('.').pop() || 'm4a'
+                const fileName = `${originalTrade.id}/${Date.now()}.${fileExt}`
+                const base64 = await FileSystem.readAsStringAsync(vn.uri, { encoding: FileSystem.EncodingType.Base64 })
+
+                const { error: uploadErr } = await supabase.storage
+                    .from('trade_voice_notes')
+                    .upload(fileName, decode(base64), { contentType: vn.mimeType || `audio/${fileExt}` })
+
+                if (!uploadErr) {
+                    const { data: vnData, error: vnInsErr } = await supabase.from('trade_voice_notes').insert({
+                        trade_id: originalTrade.id,
+                        user_id: user.id,
+                        storage_key: fileName,
+                        file_name: `Voice Note ${new Date().toLocaleTimeString()}`,
+                        mime_type: vn.mimeType || `audio/${fileExt}`,
+                        duration_seconds: Math.round(vn.duration / 1000)
+                    }).select().single()
+
+                    if (vnData && !vnInsErr) {
+                        fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/v1/trades/${originalTrade.id}/voice-notes/${vnData.id}/transcribe`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+                            }
+                        }).catch(e => console.error('Transcription trigger failed', e))
+                    }
                 }
             }
 
@@ -641,6 +734,48 @@ export default function EditTradeScreen() {
                     />
                 </View>
 
+                {/* ── Section: Voice Rationale ── */}
+                <SectionHeader title="Voice Rationale" />
+                <View style={styles.formBlock}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                        {/* Existing voice notes */}
+                        {existingVoiceNotes.map(vn => (
+                            <View key={vn.id} style={styles.voiceNoteBox}>
+                                <MaterialIcons name="mic" size={24} color="#16a24e" />
+                                <Text style={styles.voiceNoteText}>{vn.duration_seconds}s</Text>
+                                <TouchableOpacity style={styles.imgRemoveBtn} onPress={() => removeExistingVoiceNote(vn.id)}>
+                                    <MaterialIcons name="delete" size={16} color="#fff" />
+                                </TouchableOpacity>
+                            </View>
+                        ))}
+                        {/* New voice notes */}
+                        {newVoiceNotes.map((vn, idx) => (
+                            <View key={`new-vn-${idx}`} style={styles.voiceNoteBox}>
+                                <MaterialIcons name="mic" size={24} color="#16a24e" />
+                                <Text style={styles.voiceNoteText}>{Math.round(vn.duration / 1000)}s</Text>
+                                <TouchableOpacity style={styles.imgRemoveBtn} onPress={() => removeNewVoiceNote(idx)}>
+                                    <MaterialIcons name="close" size={16} color="#fff" />
+                                </TouchableOpacity>
+                                <View style={styles.newBadge}><Text style={styles.newBadgeText}>NEW</Text></View>
+                            </View>
+                        ))}
+                        {/* Record button */}
+                        <TouchableOpacity
+                            style={[styles.addImgBtn, isRecording && { borderColor: '#ef4444' }]}
+                            onPress={isRecording ? stopRecording : startRecording}
+                        >
+                            <MaterialIcons
+                                name={isRecording ? "stop" : "mic"}
+                                size={28}
+                                color={isRecording ? "#ef4444" : "#16a24e"}
+                            />
+                            <Text style={[styles.addImgText, isRecording && { color: '#ef4444' }]}>
+                                {isRecording ? "Stop" : "Record"}
+                            </Text>
+                        </TouchableOpacity>
+                    </ScrollView>
+                </View>
+
                 {/* ── Section: Screenshots ── */}
                 <SectionHeader title="Screenshots" />
                 <View style={styles.formBlock}>
@@ -832,6 +967,24 @@ const styles = StyleSheet.create({
         minHeight: 140,
         fontSize: 16,
         lineHeight: 24,
+    },
+
+    voiceNoteBox: {
+        width: 112,
+        height: 112,
+        borderRadius: 10,
+        backgroundColor: 'rgba(22, 162, 78, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(22, 162, 78, 0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 4,
+        position: 'relative',
+    },
+    voiceNoteText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#16a24e',
     },
 
     imgBox: {

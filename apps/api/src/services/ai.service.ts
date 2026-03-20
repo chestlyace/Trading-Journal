@@ -273,6 +273,63 @@ Respond ONLY with JSON:
     return savedMessage
   }
 
+  static async transcribeVoiceNote(voiceNoteId: string, userId: string): Promise<string | null> {
+    if (!genAI) throw new Error('AI Service not configured')
+
+    const { data: voiceNote, error: fetchError } = await supabaseAdmin
+      .from('trade_voice_notes')
+      .select('*')
+      .eq('id', voiceNoteId)
+      .eq('user_id', userId)
+      .single()
+
+    if (fetchError || !voiceNote) {
+      console.error('Failed to fetch voice note for transcription:', fetchError)
+      return null
+    }
+
+    // Download audio from storage
+    const { data: audioData, error: downloadError } = await supabaseAdmin
+      .storage
+      .from('trade_voice_notes')
+      .download(voiceNote.storage_key)
+
+    if (downloadError || !audioData) {
+      console.error('Failed to download audio for transcription:', downloadError)
+      return null
+    }
+
+    const audioBuffer = Buffer.from(await audioData.arrayBuffer())
+
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME })
+
+    try {
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            data: audioBuffer.toString('base64'),
+            mimeType: voiceNote.mime_type || 'audio/m4a',
+          },
+        },
+        'Transcribe the provided audio exactly. Return only the transcription text.',
+      ])
+
+      const transcription = result.response.text().trim()
+
+      if (transcription) {
+        await supabaseAdmin
+          .from('trade_voice_notes')
+          .update({ transcription })
+          .eq('id', voiceNoteId)
+      }
+
+      return transcription
+    } catch (error) {
+      console.error('Gemini Transcription Error:', error)
+      return null
+    }
+  }
+
   static async listInsights(
     userId: string,
     opts: { page?: number; pageSize?: number }

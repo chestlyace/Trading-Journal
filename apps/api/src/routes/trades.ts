@@ -4,6 +4,7 @@ import type { AuthenticatedRequest } from '../middleware/auth'
 import { authenticate } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import { TradeService } from '../services/trade.service'
+import { AIService } from '../services/ai.service'
 
 const router = Router()
 
@@ -116,6 +117,16 @@ router.delete('/:id', async (req, res, next) => {
     const userId = (req as any as AuthenticatedRequest).userId
     await TradeService.delete(userId, req.params.id)
     res.status(204).send()
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.post('/:id/voice-notes/:noteId/transcribe', async (req, res, next) => {
+  try {
+    const userId = (req as any as AuthenticatedRequest).userId
+    const transcription = await AIService.transcribeVoiceNote(req.params.noteId, userId)
+    res.json({ transcription })
   } catch (err) {
     next(err)
   }

@@ -14,6 +14,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { MaterialIcons } from '@expo/vector-icons'
 import { supabase } from '../../src/lib/supabase'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Audio } from 'expo-av'
 
 export default function TradeDetailScreen() {
     const { id } = useLocalSearchParams()
@@ -22,7 +23,12 @@ export default function TradeDetailScreen() {
     const [trade, setTrade] = useState<any>(null)
     const [tags, setTags] = useState<any[]>([])
     const [images, setImages] = useState<any[]>([])
+    const [voiceNotes, setVoiceNotes] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+
+    const [playingId, setPlayingId] = useState<string | null>(null)
+    const [sound, setSound] = useState<Audio.Sound | null>(null)
+    const [showTranscriptions, setShowTranscriptions] = useState<Record<string, boolean>>({})
 
     useEffect(() => {
         async function loadTradeData() {
@@ -58,6 +64,23 @@ export default function TradeDetailScreen() {
                         })
                     )
                     setImages(formattedImages)
+                }
+
+                const { data: vnData } = await supabase
+                    .from('trade_voice_notes')
+                    .select('*')
+                    .eq('trade_id', id)
+
+                if (vnData && vnData.length > 0) {
+                    const formattedVoiceNotes = await Promise.all(
+                        vnData.map(async (vn) => {
+                            const { data: urlData } = await supabase.storage
+                                .from('trade_voice_notes')
+                                .createSignedUrl(vn.storage_key, 3600)
+                            return { ...vn, url: urlData?.signedUrl }
+                        })
+                    )
+                    setVoiceNotes(formattedVoiceNotes)
                 }
             }
             setLoading(false)
@@ -118,6 +141,42 @@ export default function TradeDetailScreen() {
     }
 
     const strategyTags = tags.filter(t => t.tag_type === 'STRATEGY').map(t => t.tag_value)
+
+    async function playVoiceNote(id: string, url: string) {
+        if (sound) {
+            await sound.unloadAsync()
+            setSound(null)
+            if (playingId === id) {
+                setPlayingId(null)
+                return
+            }
+        }
+
+        const { sound: newSound } = await Audio.Sound.createAsync(
+            { uri: url },
+            { shouldPlay: true }
+        )
+        setSound(newSound)
+        setPlayingId(id)
+
+        newSound.setOnPlaybackStatusUpdate((status) => {
+            if (status.isLoaded && status.didJustFinish) {
+                setPlayingId(null)
+            }
+        })
+    }
+
+    const toggleTranscription = (id: string) => {
+        setShowTranscriptions(prev => ({ ...prev, [id]: !prev[id] }))
+    }
+
+    useEffect(() => {
+        return sound
+            ? () => {
+                sound.unloadAsync()
+            }
+            : undefined
+    }, [sound])
 
     return (
         <SafeAreaView style={[styles.container, isDark ? styles.bgDark : styles.bgLight]} edges={['top']}>
@@ -279,6 +338,48 @@ export default function TradeDetailScreen() {
                     </View>
                 </View>
 
+                {/* Voice Rationale */}
+                {voiceNotes.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Voice Rationale</Text>
+                        <View style={{ gap: 12 }}>
+                            {voiceNotes.map((vn) => (
+                                <View key={vn.id} style={[styles.voiceNoteCard, isDark ? styles.gridItemDark : styles.gridItemLight, isDark ? styles.borderDark : styles.borderLight]}>
+                                    <View style={styles.voiceNoteHeader}>
+                                        <TouchableOpacity
+                                            style={styles.playBtn}
+                                            onPress={() => playVoiceNote(vn.id, vn.url)}
+                                        >
+                                            <MaterialIcons
+                                                name={playingId === vn.id ? "pause-circle-filled" : "play-circle-filled"}
+                                                size={40}
+                                                color="#16a24e"
+                                            />
+                                        </TouchableOpacity>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={[styles.vnTitle, isDark ? styles.textDark : styles.textLight]}>{vn.file_name || 'Voice Note'}</Text>
+                                            <Text style={styles.vnSubtitle}>{vn.duration_seconds} seconds • {new Date(vn.created_at).toLocaleDateString()}</Text>
+                                        </View>
+                                        {vn.transcription && (
+                                            <TouchableOpacity onPress={() => toggleTranscription(vn.id)} style={styles.transcriptToggle}>
+                                                <MaterialIcons name={showTranscriptions[vn.id] ? "description" : "notes"} size={20} color="#16a24e" />
+                                                <Text style={styles.transcriptToggleText}>{showTranscriptions[vn.id] ? "Hide" : "Show"} Text</Text>
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                    {showTranscriptions[vn.id] && vn.transcription && (
+                                        <View style={[styles.transcriptionBox, isDark ? styles.borderDarkTop : styles.borderLightTop]}>
+                                            <Text style={[styles.transcriptionText, isDark ? { color: '#cbd5e1' } : { color: '#475569' }]}>
+                                                {vn.transcription}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                )}
+
             </ScrollView>
 
             {/* Footer Actions */}
@@ -373,6 +474,16 @@ const styles = StyleSheet.create({
 
     notesBox: { borderLeftWidth: 2, borderLeftColor: 'rgba(22, 162, 78, 0.3)', paddingLeft: 24 },
     notesText: { fontSize: 14, lineHeight: 24 },
+
+    voiceNoteCard: { borderRadius: 12, overflow: 'hidden', padding: 16, gap: 12 },
+    voiceNoteHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    playBtn: { padding: 0 },
+    vnTitle: { fontSize: 14, fontWeight: 'bold' },
+    vnSubtitle: { fontSize: 12, color: '#64748b' },
+    transcriptToggle: { flexDirection: 'row', alignItems: 'center', gap: 4, padding: 8, borderRadius: 8, backgroundColor: 'rgba(22, 162, 78, 0.1)' },
+    transcriptToggleText: { fontSize: 10, fontWeight: 'bold', color: '#16a24e', textTransform: 'uppercase' },
+    transcriptionBox: { paddingTop: 12, marginTop: 4 },
+    transcriptionText: { fontSize: 13, lineHeight: 20, fontStyle: 'italic' },
 
     imageCard: { width: 320, height: 192, borderRadius: 12, overflow: 'hidden', position: 'relative' },
     imgEl: { width: '100%', height: '100%' },
